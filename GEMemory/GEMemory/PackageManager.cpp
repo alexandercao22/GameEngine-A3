@@ -76,6 +76,10 @@ bool PackageManager::Pack(const std::string& path)
 			
 			// Write the compressed data to the output file
 			out.write(compressedData.data.get(), compressedData.size);
+
+			if (DEBUG) {
+				std::cout << "Packed " << key << " (" << fileData.size << " -> " << compressedData.size << " bytes)" << std::endl;
+			}
 		}
 	}
 
