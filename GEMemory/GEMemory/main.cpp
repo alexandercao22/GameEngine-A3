@@ -1,18 +1,20 @@
 #include "TestCases.h"
 #include "Interface.h"
 
-#include "raylib.h"
+//#include "raylib.h"
 
 int main() {
-	Interface interface;
+	/*Interface interface;
 
 	while (!WindowShouldClose()) {
 		interface.Update();
 	}
 
-	CloseWindow();
+	CloseWindow();*/
 
 	//PoolVSOS();
+
+
 	TestAll();
 	return 0;
 }
