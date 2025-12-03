@@ -43,6 +43,9 @@ public:
 	PackageManager() = default;
 	~PackageManager();
 
+	bool Pack(const std::string& path);
+	bool Unpack(const std::string& path);
+
 	bool MountPackage(const std::string& path);
 	AssetData LoadAsset(const std::string& assetName);
 };
