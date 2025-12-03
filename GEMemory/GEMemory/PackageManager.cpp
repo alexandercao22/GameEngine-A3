@@ -10,12 +10,12 @@ bool PackageManager::Pack(const std::string& path)
 
 	// Path validity checks
 	if (!fs::exists(rootPath)) {
-		std::cerr << "PackageManager::Pack: Path does not exist" << std::endl;
+		std::cerr << "PackageManager::Pack(): Path does not exist" << std::endl;
 		return false;
 	}
 
 	if (!fs::is_directory(rootPath)) {
-		std::cerr << "PackageManager::Pack: Path is not a directory" << std::endl;
+		std::cerr << "PackageManager::Pack(): Path is not a directory" << std::endl;
 		return false;
 	}
 
