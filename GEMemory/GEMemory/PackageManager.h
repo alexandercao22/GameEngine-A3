@@ -6,16 +6,23 @@
 #include <unordered_map>
 #include <vector>
 
+inline constexpr char SIGNATURE[6] = "GEPAK"; // Signature for files packaged by this package manager
+
 struct PackageHeader {
-	char signature[9]; // GEPACKAGE
-	unsigned int AssetCount;
-	unsigned int tableOfContentsOffset;
+	char signature[5];
+	uint32_t AssetCount;
+	uint64_t tableOfContentsOffset;
+};
+
+struct TOCEntry {
+	std::string key;
+	PackageEntry entryData;
 };
 
 struct PackageEntry {
-	unsigned int offset;
-	unsigned int size;
-	unsigned int sizeCompressed;
+	uint64_t offset;
+	uint64_t size;
+	uint64_t sizeCompressed;
 };
 
 struct MountedPackage {
@@ -25,7 +32,7 @@ struct MountedPackage {
 
 struct AssetData {
 	std::unique_ptr<char[]> data;
-	unsigned int size;
+	uint64_t size;
 };
 
 class PackageManager {
