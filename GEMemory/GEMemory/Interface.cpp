@@ -112,8 +112,8 @@ void Interface::ShowPoolInfo()
 			// Show all allocations to the current pool allocator
 			std::unordered_map<void *, Allocation> allocations = MemoryTracker::Instance().GetAllocations();
 			int index = 0;
-			for (auto &pair : allocations) {
-				Allocation allocation = pair.second;
+			for (void *ptr : currPool->ptrs) {
+				Allocation allocation = allocations[ptr];
 				if (allocation.allocator == Allocator::Pool && allocation.allocatorId == currentPool) {
 					ImGui::Text(std::string("Allocator ID: " + std::to_string(allocation.allocatorId)).c_str());
 					const void *address = (const void *)allocation.ptr;

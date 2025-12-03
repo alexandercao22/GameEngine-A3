@@ -12,7 +12,8 @@ int main() {
 
 	CloseWindow();
 
+	// Run tests
 	//PoolVSOS();
-	TestAll();
+	//TestAll();
 	return 0;
 }

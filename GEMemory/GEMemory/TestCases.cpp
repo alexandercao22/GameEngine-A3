@@ -188,85 +188,88 @@ void StackVsOS() {
 
 void TestAll() {
 	int frames = 100'000;
-	int objects = 10;
+	int objects = 5'000;
 	double poolTime[10];
 	double stackTime[10];
 	double osTime[10];
 	double buddyTime[10];
 	
 	std::cout << "Testing all allocators 100 000 iterations allocating and deallocating 10 enemies" << std::endl;
-	for (int k = 0; k < 10; k++) {
+	for (int k = 0; k < 1; k++) {
 
-		std::cout << std::endl;
-		std::cout << "--- PoolAllocator ---" << std::endl;
-		auto t0 = std::chrono::high_resolution_clock::now();
-		std::vector<Enemy*> poolPtrs;
-		PoolAllocator pool;
-		pool.Init(10, sizeof(Enemy));
-		for (int i = 0; i < frames; i++) {
-			for (int y = 0; y < objects; y++) {
-				Enemy* enemy = (Enemy*)pool.Request();
-				poolPtrs.push_back(enemy);
-			}
-			for (Enemy* enemy : poolPtrs) {
-				pool.Free(enemy);
-			}
-			poolPtrs.clear();
-		}
-		auto t1 = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<double> duration = t1 - t0;
-		poolTime[k] = duration.count();
-		std::cout << "Execution time: " << duration.count() << std::endl;
-		std::cout << std::endl;
-		std::cout << "--- StackAllocator ---" << std::endl;
+		//std::cout << std::endl;
+		//std::cout << "--- PoolAllocator ---" << std::endl;
+		//auto t0 = std::chrono::high_resolution_clock::now();
+		//std::vector<Enemy*> poolPtrs;
+		//PoolAllocator pool;
+		//pool.Init(objects, sizeof(Enemy));
+		////for (int i = 0; i < frames; i++) {
+		////	for (int y = 0; y < objects; y++) {
+		////		Enemy* enemy = (Enemy*)pool.Request();
+		////		poolPtrs.push_back(enemy);
+		////	}
+		////	for (Enemy* enemy : poolPtrs) {
+		////		pool.Free(enemy);
+		////	}
+		////	poolPtrs.clear();
+		////}
+		//auto t1 = std::chrono::high_resolution_clock::now();
+		//std::chrono::duration<double> duration = t1 - t0;
+		//poolTime[k] = duration.count();
+		//std::cout << "Execution time: " << duration.count() << std::endl;
+		//std::cout << std::endl;
+		//std::cout << "--- StackAllocator ---" << std::endl;
 
-		t0 = std::chrono::high_resolution_clock::now();
-		std::vector<Enemy*> stackPtrs;
-		StackAllocator stack;
-		stack.Init(12 * sizeof(Enemy));
+		//t0 = std::chrono::high_resolution_clock::now();
+		//std::vector<Enemy*> stackPtrs;
+		//StackAllocator stack;
+		//stack.Init(objects * sizeof(Enemy));
 
-		for (int i = 0; i < frames; i++) {
-			for (int y = 0; y < objects; y++) {
-				Enemy* enemy = (Enemy*)stack.Request(sizeof(Enemy));
-				poolPtrs.push_back(enemy);
-			}
-			stack.Reset();
-			stackPtrs.clear();
-		}
-		t1 = std::chrono::high_resolution_clock::now();
+		//for (int i = 0; i < frames; i++) {
+		//	for (int y = 0; y < objects; y++) {
+		//		Enemy* enemy = (Enemy*)stack.Request(sizeof(Enemy));
+		//		poolPtrs.push_back(enemy);
+		//	}
+		//	if (frames % 1000 == 0)
+		//		std::cout << "hej";
+		//	stack.Reset();
+		//	stackPtrs.clear();
+		//}
+		//t1 = std::chrono::high_resolution_clock::now();
 	
-		duration = t1 - t0;
-		stackTime[k] = duration.count();
-		std::cout << "Execution time: " << duration.count() << std::endl;
-		std::cout << std::endl;
-		std::cout << "--- OSAllocator ---" << std::endl;
-		t0 = std::chrono::high_resolution_clock::now();
+		//duration = t1 - t0;
+		//stackTime[k] = duration.count();
+		//std::cout << "Execution time: " << duration.count() << std::endl;
+		//std::cout << std::endl;
+		//std::cout << "--- OSAllocator ---" << std::endl;
+		//t0 = std::chrono::high_resolution_clock::now();
 
-		std::vector<Enemy*> OSPtrs;
+		//std::vector<Enemy*> OSPtrs;
 
-		for (int i = 0; i < frames; i++) {
-			for (int y = 0; y < objects; y++) {
-				Enemy* enemy = new Enemy;
-				OSPtrs.push_back(enemy);
-			}
-			for (Enemy* enemy : OSPtrs) {
-				delete enemy;
-			}
+		//for (int i = 0; i < frames; i++) {
+		//	for (int y = 0; y < objects; y++) {
+		//		Enemy* enemy = new Enemy;
+		//		OSPtrs.push_back(enemy);
+		//	}
+		//	for (Enemy* enemy : OSPtrs) {
+		//		delete enemy;
+		//	}
 
-			OSPtrs.clear();
-		}
 
-		t1 = std::chrono::high_resolution_clock::now();
+		//	OSPtrs.clear();
+		//}
 
-		duration = t1 - t0;
-		osTime[k] = duration.count();
-		std::cout << "Execution time: " << duration.count() << std::endl;
-		std::cout << std::endl;
+		//t1 = std::chrono::high_resolution_clock::now();
+
+		//duration = t1 - t0;
+		//osTime[k] = duration.count();
+		//std::cout << "Execution time: " << duration.count() << std::endl;
+		//std::cout << std::endl;
 		std::cout << "--- BuddyAllocator ---" << std::endl;
-		t0 = std::chrono::high_resolution_clock::now();
+		auto t0 = std::chrono::high_resolution_clock::now();
 		std::vector<Enemy*> buddyPtrs;
 		BuddyAllocator buddy;
-		buddy.Init(2048);
+		buddy.Init(std::pow(2,18));
 
 		for (int i = 0; i < frames; i++) {
 			for (int y = 0; y < objects; y++) {
@@ -279,8 +282,8 @@ void TestAll() {
 
 			buddyPtrs.clear();
 		}
-		t1 = std::chrono::high_resolution_clock::now();
-		duration = t1 - t0;
+		auto t1 = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> duration = t1 - t0;
 		buddyTime[k] = duration.count();
 		std::cout << "Execution time: " << duration.count() << std::endl;
 		std::cout << std::endl;
