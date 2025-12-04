@@ -26,8 +26,8 @@ struct TOCEntry {
 };
 
 struct MountedPackage {
-	std::ifstream openFile;
-	std::unordered_map<std::string, PackageEntry> tableOfContents; // Key (string): name of the file inside the package
+	std::ifstream openFile; // Package (open while mounted)
+	std::unordered_map<std::string, PackageEntry> tableOfContents; // Key (string): name of the file inside the package (file.extension)
 };
 
 struct AssetData {
@@ -37,7 +37,7 @@ struct AssetData {
 
 class PackageManager {
 private:
-	std::vector<MountedPackage> mountedPackages;
+	std::unordered_map<std::string, MountedPackage> _mountedPackages; // key (string): name of the package file (package.gepak)
 
 public:
 	PackageManager() = default;
@@ -46,6 +46,6 @@ public:
 	bool Pack(const std::string& source, const std::string& target);
 	bool Unpack(const std::string& source, const std::string& target);
 
-	bool MountPackage(const std::string& path);
 	AssetData LoadAsset(const std::string& assetName);
+	bool MountPackage(const std::string& source);
 };

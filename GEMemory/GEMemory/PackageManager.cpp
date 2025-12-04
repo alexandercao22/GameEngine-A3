@@ -238,14 +238,64 @@ bool PackageManager::Unpack(const std::string& source, const std::string& target
 	return true;
 }
 
-bool PackageManager::MountPackage(const std::string& path)
+bool PackageManager::MountPackage(const std::string& source)
 {
-	// Check if package has the correck signature
-	// 
-	// Read header and toc and create a MountedPakcage filled with PackageEntry's and add it to _mountedPackages
+	fs::path sourcePath(source);
 
+	// Path validity checks
+	if (!fs::exists(sourcePath)) {
+		std::cerr << "PackageManager::MountPackage(): Source does not exist" << std::endl;
+		return false;
+	}
 
-	return false;
+	if (!fs::is_regular_file(sourcePath)) {
+		std::cerr << "PackageManager::MountPackage(): Source is not a file" << std::endl;
+		return false;
+	}
+
+	// Read file
+	std::ifstream in(sourcePath, std::ios::binary);
+	if (!in) {
+		std::cerr << "PackageManager::MountPackage(): Could not read file" << std::endl;
+		return false;
+	}
+
+	PackageHeader header;
+	in.read(reinterpret_cast<char*>(&header), sizeof(header));
+
+	// Signature check
+	if (std::memcmp(header.signature, SIGNATURE, sizeof(header.signature)) != 0) {
+		std::cerr << "PackageManager::MountPackage(): Signature does not match" << std::endl;
+		return false;
+	}
+
+	MountedPackage mountedPackage;
+
+	// Loop through toc and collect all entries
+	in.seekg(header.tableOfContentsOffset);
+	for (int i = 0; i < header.AssetCount; i++) {
+		TOCEntry entry;
+
+		// The length of the key
+		uint32_t keyLength;
+		in.read(reinterpret_cast<char*>(&keyLength), sizeof(keyLength));
+
+		// The key
+		std::string key;
+		key.resize(keyLength);
+		in.read(key.data(), keyLength);
+
+		// The entry data (PackageEntry)
+		in.read(reinterpret_cast<char*>(&entry.packageEntry), sizeof(entry.packageEntry));
+
+		mountedPackage.tableOfContents.emplace(key, entry.packageEntry);
+	}
+
+	mountedPackage.openFile = std::move(in);
+	std::string packageName = sourcePath.stem().generic_string();
+	_mountedPackages.emplace(packageName, std::move(mountedPackage)); // Have to use std::move as mountedPackage is non-copyable
+
+	return true;
 }
 
 AssetData PackageManager::LoadAsset(const std::string& assetName)
