@@ -120,13 +120,122 @@ bool PackageManager::Pack(const std::string& source, const std::string& target)
 	return true;
 }
 
-bool PackageManager::Unpack(const std::string& path)
+bool PackageManager::Unpack(const std::string& source, const std::string& target)
 {
-	// Check if package has the correct signature
-	//
-	// Restore the folder to its original state
+	fs::path sourcePath(source);
+	fs::path targetPath(target); // Should this be an input parameter?
 
-	return false;
+	// Path validity checks
+	if (!fs::exists(sourcePath)) {
+		std::cerr << "PackageManager::Unpack(): Source does not exist" << std::endl;
+		return false;
+	}
+
+	if (!fs::exists(targetPath)) {
+		std::cerr << "PackageManager::Unpack(): Target does not exist" << std::endl;
+		return false;
+	}
+
+	if (!fs::is_regular_file(sourcePath)) {
+		std::cerr << "PackageManager::Unpack(): Source is not a file" << std::endl;
+		return false;
+	}
+
+	if (!fs::is_directory(targetPath)) {
+		std::cerr << "PackageManager::Unpack(): Target is not a directory" << std::endl;
+		return false;
+	}
+
+	// Read file
+	std::ifstream in(sourcePath, std::ios::binary);
+	if (!in) {
+		std::cerr << "PackageManager::Unpack(): Could not read file" << std::endl;
+		return false;
+	}
+
+	PackageHeader header;
+	in.read(reinterpret_cast<char*>(&header), sizeof(header));
+	
+	// Signature check
+	if (std::memcmp(header.signature, SIGNATURE, sizeof(header.signature)) != 0) {
+		std::cerr << "PackageManager::Unpack(): Signature does not match" << std::endl;
+		return false;
+	}
+
+	// Loop through toc and collect all entries
+	in.seekg(header.tableOfContentsOffset);
+	std::vector<TOCEntry> toc;
+	for (int i = 0; i < header.AssetCount; i++) {
+		TOCEntry entry;
+
+		// The length of the key
+		uint32_t keyLength;
+		in.read(reinterpret_cast<char*>(&keyLength), sizeof(keyLength));
+
+		// The key
+		std::string key;
+		key.resize(keyLength);
+		in.read(key.data(), keyLength);
+
+		// The entry data (PackageEntry)
+		in.read(reinterpret_cast<char*>(&entry.entryData), sizeof(entry.entryData));
+		
+		toc.push_back(entry);
+	}
+
+	// Create the unpacked package directory
+	targetPath = targetPath / sourcePath.stem();
+	if (fs::exists(targetPath)) {
+		std::cerr << "PackageManager::Unpack(): Target already contains a directory with package name" << std::endl;
+		return false;
+	}
+	fs::create_directory(targetPath);
+
+	// Go through all entries and restore the files
+	for (auto& entry : toc) {
+		fs::path relativePath(entry.key);
+		fs::path filePath = targetPath / relativePath;
+
+		// Creating necessary directories within the package
+		if (filePath.has_parent_path()) {
+			fs::create_directories(filePath.parent_path());
+		}
+		
+		// Reading the compressed data from the package
+		AssetData compressedData;
+		compressedData.size = entry.entryData.sizeCompressed;
+		compressedData.data = std::make_unique<char[]>(entry.entryData.sizeCompressed);
+
+		in.seekg(entry.entryData.offset);
+		in.read(compressedData.data.get(), compressedData.size);
+
+		// Decompressing the compressed data
+		AssetData uncompressedData;
+		uncompressedData.size = entry.entryData.size;
+		uncompressedData.data = std::make_unique<char[]>(entry.entryData.size);
+
+		int uncompressedSize = LZ4_decompress_safe(
+			compressedData.data.get(), 
+			uncompressedData.data.get(), 
+			static_cast<int>(compressedData.size), 
+			static_cast<int>(uncompressedData.size)
+		);
+
+		if (uncompressedSize < 0) {
+			// Decompression failed
+			std::cerr << "PackageManager::Unpack(): Decompression failed for " << entry.key << std::endl;
+			continue;
+		}
+
+		std::ofstream out(filePath, std::ios::binary);
+		out.write(uncompressedData.data.get(), uncompressedData.size);
+
+		if (DEBUG) {
+			std::cout << "Unpacked " << entry.key << " (" << compressedData.size << " -> " << uncompressedData.size << " bytes)" << std::endl;
+		}
+	}
+
+	return true;
 }
 
 bool PackageManager::MountPackage(const std::string& path)
