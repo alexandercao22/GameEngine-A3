@@ -46,6 +46,6 @@ public:
 	bool Pack(const std::string& source, const std::string& target);
 	bool Unpack(const std::string& source, const std::string& target);
 
-	AssetData LoadAsset(const std::string& assetName);
 	bool MountPackage(const std::string& source);
+	bool LoadAsset(const std::string& key, const std::string& packageKey, AssetData& asset);
 };

@@ -298,10 +298,51 @@ bool PackageManager::MountPackage(const std::string& source)
 	return true;
 }
 
-AssetData PackageManager::LoadAsset(const std::string& assetName)
+bool PackageManager::LoadAsset(const std::string& assetKey, const std::string& packageKey, AssetData& asset)
 {
-	// Search the all mounted packages for the assetName (filename.extension)
-	// If it is found, load it into memory and return it as AssetData
+	// Search the mounted packages with packageKey
+	auto packagePair = _mountedPackages.find(packageKey);
+	if (packagePair == _mountedPackages.end()) {
+		std::cerr << "PackageManager::LoadAsset(): No package with matching key has been mounted" << std::endl;
+		return false;
+	}
+	MountedPackage& mountedPackage = packagePair->second;
 
-	return AssetData();
+	// Search the mounted package for the assetKey (path_within_package\filename.extension)
+	auto entryPair = mountedPackage.tableOfContents.find(assetKey);
+	if (entryPair == mountedPackage.tableOfContents.end()) {
+		std::cerr << "PackageManager::LoadAsset(): No asset with matching key exists within the mounted package" << std::endl;
+		return false;
+	}
+	PackageEntry packageEntry = entryPair->second;
+
+	// Read compressed data into a buffer
+	AssetData compressedData;
+	compressedData.size = packageEntry.sizeCompressed;
+	compressedData.data = std::make_unique<char[]>(packageEntry.sizeCompressed);
+
+	mountedPackage.openFile.clear(); // Resets read if EOF has been hit
+	mountedPackage.openFile.seekg(packageEntry.offset);
+	mountedPackage.openFile.read(compressedData.data.get(), compressedData.size);
+
+	// Decompress data from buffer
+	AssetData uncompressedData;
+	uncompressedData.size = packageEntry.size;
+	uncompressedData.data = std::make_unique<char[]>(packageEntry.size);
+
+	int uncompressedSize = LZ4_decompress_safe(
+		compressedData.data.get(),
+		uncompressedData.data.get(),
+		static_cast<int>(compressedData.size),
+		static_cast<int>(uncompressedData.size)
+	);
+
+	if (uncompressedSize < 0) {
+		std::cerr << "PackageManager::LoadAsset(): Decompression failed" << std::endl;
+		return false;
+	}
+
+	asset = std::move(uncompressedData);
+
+	return true;
 }
