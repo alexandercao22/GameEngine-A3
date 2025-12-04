@@ -46,6 +46,11 @@ bool PackageManager::Pack(const std::string& source, const std::string& target)
 	// Table of contents (To be written at the back of the package)
 	std::vector<TOCEntry> toc;
 
+
+	if (DEBUG) {
+		std::cout << "Starting packing: " << packageName << std::endl;
+	}
+
 	// Packaging directory
 	for (const auto& dirEntry : fs::recursive_directory_iterator(sourcePath)) {
 		if (fs::is_regular_file(dirEntry)) {
@@ -116,6 +121,10 @@ bool PackageManager::Pack(const std::string& source, const std::string& target)
 
 	out.seekp(0);
 	out.write(reinterpret_cast<char*>(&header), sizeof(header));
+
+	if (DEBUG) {
+		std::cout << "Finished packing: " << packageName << std::endl;
+	}
 
 	return true;
 }
@@ -190,6 +199,10 @@ bool PackageManager::Unpack(const std::string& source, const std::string& target
 		return false;
 	}
 	fs::create_directory(targetPath);
+
+	if (DEBUG) {
+		std::cout << "Starting unpacking: " << sourcePath.filename().string() << std::endl;
+	}
 
 	// Go through all entries and restore the files
 	for (auto& entry : toc) {
@@ -365,6 +378,10 @@ bool PackageManager::LoadAsset(const std::string& assetKey, const std::string& p
 	}
 
 	asset = std::move(uncompressedData);
+
+	if (DEBUG) {
+		std::cout << "Loaded asset: " << assetKey << std::endl;
+	}
 
 	return true;
 }
