@@ -14,15 +14,15 @@ struct PackageHeader {
 	uint64_t tableOfContentsOffset;
 };
 
-struct TOCEntry {
-	std::string key;
-	PackageEntry entryData;
-};
-
 struct PackageEntry {
 	uint64_t offset;
 	uint64_t size;
 	uint64_t sizeCompressed;
+};
+
+struct TOCEntry {
+	std::string key;
+	PackageEntry entryData;
 };
 
 struct MountedPackage {
