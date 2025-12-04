@@ -4,24 +4,37 @@
 
 namespace fs = std::filesystem;
 
-bool PackageManager::Pack(const std::string& path)
+bool PackageManager::Pack(const std::string& source, const std::string& target)
 {
-	fs::path rootPath(path);
+	fs::path sourcePath(source);
+	fs::path targetPath(target);
 
 	// Path validity checks
-	if (!fs::exists(rootPath)) {
-		std::cerr << "PackageManager::Pack(): Path does not exist" << std::endl;
+	if (!fs::exists(sourcePath)) {
+		std::cerr << "PackageManager::Pack(): Source does not exist" << std::endl;
 		return false;
 	}
 
-	if (!fs::is_directory(rootPath)) {
-		std::cerr << "PackageManager::Pack(): Path is not a directory" << std::endl;
+	if (!fs::exists(targetPath)) {
+		std::cerr << "PackageManager::Pack(): Target does not exist" << std::endl;
+		return false;
+	}
+
+	if (!fs::is_directory(sourcePath)) {
+		std::cerr << "PackageManager::Pack(): Source is not a directory" << std::endl;
+		return false;
+	}
+
+	if (!fs::is_directory(targetPath)) {
+		std::cerr << "PackageManager::Pack(): Target is not a directory" << std::endl;
 		return false;
 	}
 
 	// Output file (package)
-	std::ofstream out("data.gepak", std::ios::binary);
-	if (!out) {
+	std::string packageName = sourcePath.stem().string() + ".gepak";
+	targetPath = targetPath / packageName;
+	std::ofstream out(targetPath, std::ios::binary);
+	if (!out) { 
 		std::cerr << "PackageManager::Pack(): Unable to create output file" << std::endl;
 		return false;
 	}
@@ -34,10 +47,10 @@ bool PackageManager::Pack(const std::string& path)
 	std::vector<TOCEntry> toc;
 
 	// Packaging directory
-	for (const auto& dirEntry : fs::recursive_directory_iterator(rootPath)) {
+	for (const auto& dirEntry : fs::recursive_directory_iterator(sourcePath)) {
 		if (fs::is_regular_file(dirEntry)) {
 			fs::path entryPath = dirEntry.path();
-			fs::path relativePath = fs::relative(entryPath, rootPath); // Relative path for TOC entry
+			fs::path relativePath = fs::relative(entryPath, sourcePath); // Relative path for TOC entry
 			std::string key = relativePath.generic_string();
 
 			// Read file
@@ -47,19 +60,19 @@ bool PackageManager::Pack(const std::string& path)
 				return false;
 			}
 
-			AssetData fileData;
+			AssetData uncompressedData;
 			in.seekg(0, std::ios::end); // Set cursor to end of file
-			fileData.size = static_cast<uint64_t>(in.tellg()); // Get cursor pos
+			uncompressedData.size = static_cast<uint64_t>(in.tellg()); // Get cursor pos
 			in.seekg(0, std::ios::beg); // Reset curosr to start of file
-			fileData.data = std::make_unique<char[]>(fileData.size);
-			in.read(fileData.data.get(), fileData.size); // Filling AssetData with file contents
+			uncompressedData.data = std::make_unique<char[]>(uncompressedData.size);
+			in.read(uncompressedData.data.get(), uncompressedData.size); // Filling AssetData with file contents
 
 			AssetData compressedData;
-			int maxSizeCompressed = LZ4_compressBound(fileData.size); // Maximum size the compressed version can reach
+			int maxSizeCompressed = LZ4_compressBound(uncompressedData.size); // Maximum size the compressed version can reach
 			compressedData.data = std::make_unique<char[]>(maxSizeCompressed);
 
 			// Compressing file
-			int sizeCompressed = LZ4_compress_default(fileData.data.get(), compressedData.data.get(), fileData.size, maxSizeCompressed);
+			int sizeCompressed = LZ4_compress_default(uncompressedData.data.get(), compressedData.data.get(), uncompressedData.size, maxSizeCompressed);
 			if (sizeCompressed == 0) {
 				std::cerr << "PackageManager::Pack(): Compression error" << std::endl;
 				return false;
@@ -69,7 +82,7 @@ bool PackageManager::Pack(const std::string& path)
 			TOCEntry entry;
 			entry.key = key;
 			entry.entryData.offset = static_cast<uint64_t>(out.tellp());
-			entry.entryData.size = fileData.size;
+			entry.entryData.size = uncompressedData.size;
 			entry.entryData.sizeCompressed = static_cast<uint64_t>(sizeCompressed);
 
 			toc.push_back(entry);
@@ -78,7 +91,7 @@ bool PackageManager::Pack(const std::string& path)
 			out.write(compressedData.data.get(), compressedData.size);
 
 			if (DEBUG) {
-				std::cout << "Packed " << key << " (" << fileData.size << " -> " << compressedData.size << " bytes)" << std::endl;
+				std::cout << "Packed " << key << " (" << uncompressedData.size << " -> " << compressedData.size << " bytes)" << std::endl;
 			}
 		}
 	}
@@ -86,7 +99,7 @@ bool PackageManager::Pack(const std::string& path)
 	// Finalizing header
 	header.tableOfContentsOffset = out.tellp(); // Recording starting offset for the TOC
 	header.AssetCount = toc.size();
-	std::memcpy(header.signature, SIGNATURE, sizeof(SIGNATURE));
+	std::memcpy(header.signature, SIGNATURE, sizeof(header.signature));
 
 	// Writing table of contents to the back of the package
 	for (TOCEntry& entry : toc) {
