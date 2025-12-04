@@ -292,8 +292,30 @@ bool PackageManager::MountPackage(const std::string& source)
 	}
 
 	mountedPackage.openFile = std::move(in);
-	std::string packageName = sourcePath.stem().generic_string();
-	_mountedPackages.emplace(packageName, std::move(mountedPackage)); // Have to use std::move as mountedPackage is non-copyable
+	std::string packageKey = sourcePath.stem().generic_string();
+	_mountedPackages.emplace(packageKey, std::move(mountedPackage)); // Have to use std::move as mountedPackage is non-copyable
+
+
+	if (DEBUG) {
+		std::cout << "Mounted package: " << packageKey << std::endl;
+	}
+
+	return true;
+}
+
+bool PackageManager::UnmountPackage(const std::string& packageKey)
+{
+	// Search the mounted packages with packageKey
+	auto packagePair = _mountedPackages.find(packageKey);
+	if (packagePair == _mountedPackages.end()) {
+		std::cerr << "PackageManager::LoadAsset(): No package with matching key has been mounted" << std::endl;
+		return false;
+	}
+	_mountedPackages.erase(packagePair);
+
+	if (DEBUG) {
+		std::cout << "Unmounted package: " << packageKey << std::endl;
+	}
 
 	return true;
 }
