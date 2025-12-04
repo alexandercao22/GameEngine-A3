@@ -31,7 +31,7 @@ bool PackageManager::Pack(const std::string& source, const std::string& target)
 	}
 
 	// Output file (package)
-	std::string packageName = sourcePath.stem().string() + ".gepak";
+	std::string packageName = sourcePath.stem().generic_string() + ".gepak";
 	targetPath = targetPath / packageName;
 	std::ofstream out(targetPath, std::ios::binary);
 	if (!out) { 
@@ -81,9 +81,9 @@ bool PackageManager::Pack(const std::string& source, const std::string& target)
 
 			TOCEntry entry;
 			entry.key = key;
-			entry.entryData.offset = static_cast<uint64_t>(out.tellp());
-			entry.entryData.size = uncompressedData.size;
-			entry.entryData.sizeCompressed = static_cast<uint64_t>(sizeCompressed);
+			entry.packageEntry.offset = static_cast<uint64_t>(out.tellp());
+			entry.packageEntry.size = uncompressedData.size;
+			entry.packageEntry.sizeCompressed = static_cast<uint64_t>(sizeCompressed);
 
 			toc.push_back(entry);
 			
@@ -111,7 +111,7 @@ bool PackageManager::Pack(const std::string& source, const std::string& target)
 		out.write(entry.key.data(), keyLength);
 
 		// The entry data (PackageEntry)
-		out.write(reinterpret_cast<char*>(&entry.entryData), sizeof(entry.entryData));
+		out.write(reinterpret_cast<char*>(&entry.packageEntry), sizeof(entry.packageEntry));
 	}
 
 	out.seekp(0);
@@ -178,7 +178,7 @@ bool PackageManager::Unpack(const std::string& source, const std::string& target
 		in.read(key.data(), keyLength);
 
 		// The entry data (PackageEntry)
-		in.read(reinterpret_cast<char*>(&entry.entryData), sizeof(entry.entryData));
+		in.read(reinterpret_cast<char*>(&entry.packageEntry), sizeof(entry.packageEntry));
 		
 		toc.push_back(entry);
 	}
@@ -203,16 +203,16 @@ bool PackageManager::Unpack(const std::string& source, const std::string& target
 		
 		// Reading the compressed data from the package
 		AssetData compressedData;
-		compressedData.size = entry.entryData.sizeCompressed;
-		compressedData.data = std::make_unique<char[]>(entry.entryData.sizeCompressed);
+		compressedData.size = entry.packageEntry.sizeCompressed;
+		compressedData.data = std::make_unique<char[]>(entry.packageEntry.sizeCompressed);
 
-		in.seekg(entry.entryData.offset);
+		in.seekg(entry.packageEntry.offset);
 		in.read(compressedData.data.get(), compressedData.size);
 
 		// Decompressing the compressed data
 		AssetData uncompressedData;
-		uncompressedData.size = entry.entryData.size;
-		uncompressedData.data = std::make_unique<char[]>(entry.entryData.size);
+		uncompressedData.size = entry.packageEntry.size;
+		uncompressedData.data = std::make_unique<char[]>(entry.packageEntry.size);
 
 		int uncompressedSize = LZ4_decompress_safe(
 			compressedData.data.get(), 

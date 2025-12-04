@@ -22,7 +22,7 @@ struct PackageEntry {
 
 struct TOCEntry {
 	std::string key;
-	PackageEntry entryData;
+	PackageEntry packageEntry;
 };
 
 struct MountedPackage {
