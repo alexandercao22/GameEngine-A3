@@ -36,49 +36,34 @@ std::string GenerateGUID() {
 	return ss.str();
 }
 
-std::string ResourceManager::SaveGUID(std::string path) {
-	// Checking if asset already exists in folder
-	// to prohibit duplication
+Resource *ResourceManager::LoadFromDisk(std::string path) {
+	std::string guid = _PathtoGUID[path];
+	std::string type = _GUIDtoType[guid];
 
-	std::cout << "Hejsan" << std::endl;
-	for (auto paths : _PathtoGUID) {
-		if (paths.first == path) {
-			std::cout << "ERROR: Asset already exists in Resources." << std::endl;
-			return {};
-		}
+	Resource *res = nullptr;
+	if (type == "Mesh") {
+		res = new MeshResource();
 	}
-	
+	res->LoadFromDisk(path);
+	_cachedResources.insert({ guid, res });
 
-	std::string guid = GenerateGUID();
-
-	_PathtoGUID.insert({ path, guid });
-	_GUIDtoPath.insert({ guid, path });
-
-	std::ofstream file("Resources/Assets.txt", std::ios::app);
-
-	if (!file.is_open()) {
-		std::cerr << "Failed to open Assets.txt for appending\n";
-		return 0;
-	}
-
-	file << guid << ":" << "type:" << path << "\n";
-
-	return guid;
-
+	return res;
 }
 
 ResourceManager::~ResourceManager() {
-	for (auto res : CachedResources) {
+	for (auto res : _cachedResources) {
 		delete res.second;
 	}
 }
 
-void ResourceManager::Init() {
+bool ResourceManager::Init() {
 	std::ifstream file("Resources/Assets.txt");
 
 	if (!file.is_open()) {
-		std::cerr << "Failed to open Assets file" << std::endl;
+		std::cerr << "ResourceManager::Init(): Failed to open Assets file" << std::endl;
+		return false;
 	}
+
 	std::string line;
 	while (std::getline(file, line)) {
 		// hardcoded substrings since every GUID is 35 spots long
@@ -92,16 +77,15 @@ void ResourceManager::Init() {
 		_PathtoGUID.insert({ path, guid });
 		_GUIDtoPath.insert({ guid, path}); 
 		_GUIDtoType.insert({ guid, type}); 
-
 	}
-
+	return true;
 }
 
-Resource* ResourceManager::Load(std::string guid) {
-	for (auto guids : CachedResources) {
+Resource *ResourceManager::Load(std::string guid) {
+	for (auto guids : _cachedResources) {
 		if (guids.first == guid) {
-			CachedResources[guid]->RefAdd();
-			return CachedResources[guid];
+			_cachedResources[guid]->RefAdd();
+			return _cachedResources[guid];
 		}
 	}
 	int exist = 0;
@@ -113,39 +97,46 @@ Resource* ResourceManager::Load(std::string guid) {
 	// Save GUID
 }
 
-Resource* ResourceManager::LoadFromDisk(std::string path) {
-	std::string guid = _PathtoGUID[path];
-	std::string type = _GUIDtoType[guid];
-
-	Resource* res = nullptr;
-	if (type == "Mesh") {
-		res = new MeshResource();
-	}
-	res->LoadFromDisk(path);
-	CachedResources.insert({ guid, res });
-
-	std::cout << "Hur många gånger anropas denna funktion?" << std::endl;
-
-	return res;
-	
-}
-
-bool ResourceManager::UnLoad(std::string GUID) {
-	Resource* res = CachedResources[GUID];
+bool ResourceManager::Unload(std::string guid) {
+	Resource* res = _cachedResources[guid];
 	if (res == nullptr) {
 		return false;
 	}
 	int ref = res->GetRef();
 	if (ref == 1) {
-		CachedResources[GUID]->UnLoad();
-		CachedResources.erase(GUID);
+		_cachedResources[guid]->UnLoad();
+		_cachedResources.erase(guid);
 		return true;
 	}
 	else if (ref > 1) {
-		CachedResources[GUID]->RefSub();
+		_cachedResources[guid]->RefSub();
 		return true;
 	}
 	else {
 		return false;
 	}
+}
+
+std::string ResourceManager::SaveGUID(std::string path) {
+	// Checking if asset already exists in folder to prohibit duplication
+	for (auto paths : _PathtoGUID) {
+		if (paths.first == path) {
+			std::cerr << "ResourceManager::SaveGUID(): Asset already exists in Resources" << std::endl;
+			return "";
+		}
+	}
+
+	std::string guid = GenerateGUID();
+
+	_PathtoGUID.insert({ path, guid });
+	_GUIDtoPath.insert({ guid, path });
+
+	std::ofstream file("Resources/Assets.txt", std::ios::app);
+	if (!file.is_open()) {
+		std::cerr << "ResourceManager::SaveGUID(): Failed to open Assets.txt for appending" << std::endl;
+		return "";
+	}
+
+	file << guid << ":" << "type:" << path << "\n";
+	return guid;
 }

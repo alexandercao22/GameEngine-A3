@@ -29,15 +29,18 @@ private:
 	std::unordered_map<std::string, std::string> _PathtoGUID;
 	std::unordered_map<std::string, std::string> _GUIDtoType;
 	// List of cached Resources
-	std::unordered_map<std::string, Resource*> CachedResources;
+	std::unordered_map<std::string, Resource*> _cachedResources;
 
 	Resource* LoadFromDisk(std::string path);
 
 public:
+	ResourceManager() = default;
 	~ResourceManager();
-	void Init();
-	Resource* Load(std::string id);
-	bool UnLoad(std::string id);
+
+	bool Init();
+
+	Resource* Load(std::string guid);
+	bool Unload(std::string guid);
 
 	std::string SaveGUID(std::string path);
 };
