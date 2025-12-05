@@ -37,7 +37,7 @@ public:
 	~ResourceManager();
 	void Init();
 	Resource* Load(std::string id);
-	bool Unload(std::string id);
+	bool UnLoad(std::string id);
 
 	std::string SaveGUID(std::string path);
 };

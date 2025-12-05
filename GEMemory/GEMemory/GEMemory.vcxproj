@@ -138,6 +138,7 @@
     <ClCompile Include="MemoryTracker.cpp" />
     <ClCompile Include="MeshResource.cpp" />
     <ClCompile Include="PoolAllocator.cpp" />
+    <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="rlImGui.cpp" />
     <ClCompile Include="StackAllocator.cpp" />

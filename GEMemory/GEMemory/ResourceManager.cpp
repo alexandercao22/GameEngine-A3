@@ -100,6 +100,7 @@ void ResourceManager::Init() {
 Resource* ResourceManager::Load(std::string guid) {
 	for (auto guids : CachedResources) {
 		if (guids.first == guid) {
+			CachedResources[guid]->RefAdd();
 			return CachedResources[guid];
 		}
 	}
@@ -127,4 +128,23 @@ Resource* ResourceManager::LoadFromDisk(std::string path) {
 
 	return res;
 	
+}
+
+bool ResourceManager::UnLoad(std::string GUID) {
+	Resource* res = CachedResources[GUID];
+	if (res == nullptr) {
+		return false;
+	}
+	int ref = res->GetRef();
+	if (ref == 1) {
+		CachedResources.erase(GUID);
+		return true;
+	}
+	else if (ref > 1) {
+		CachedResources[GUID]->RefSub();
+		return true;
+	}
+	else {
+		return false;
+	}
 }

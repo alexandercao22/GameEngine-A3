@@ -12,6 +12,7 @@ public:
 	
 	MeshResource* LoadFromDisk(std::string GUID) override;
 	void UnLoad() override;
-	
+	void AddRef();
+	int GetRef();
 	Model GetModel();
 };

@@ -4,6 +4,7 @@
 #include "MeshResource.h"
 
 #include "raylib.h"
+#include <chrono>
 
 int main() {
 	//Interface interface;
@@ -34,7 +35,11 @@ int main() {
 
 	MeshResource* meshroom2 = dynamic_cast<MeshResource*>(RM.Load("69f74b0d-b87d-44b0-bb89-4fb94b5243c8"));
 
+	double time = 0;
+
 	while (!WindowShouldClose()) {
+		auto t0 = std::chrono::high_resolution_clock::now();
+		
 		//interface.Update();
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
@@ -48,10 +53,25 @@ int main() {
 		EndMode3D();
 		// --- 3D Mode slutar här ---
 		EndDrawing();
+		
+		meshroom1->UnLoad();
 
 		//DrawModel(LoadModelFromMesh(GenMeshCube(5, 4, 5)), Vector3{ 0,0,-1 }, 1.0f, BLUE);
+		auto t1 = std::chrono::high_resolution_clock::now(); 
+		std::chrono::duration<double> duration = t1 - t0;
+		time += duration.count();
 
+		if (time >= 5) {
+
+			if (!RM.UnLoad("69f74b0d-b87d-44b0-bb89-4fb94b5243c8")) {
+				std::cerr << "ERROR: Trying to UnLoad already unloaded content" << std::endl;
+			}
+			time = 0;
+		}
 	}
+
+	delete meshroom1;
+	delete meshroom2;
 	UnloadModel(cubeModel);
 	CloseWindow();
 
