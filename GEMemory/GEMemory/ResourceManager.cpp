@@ -61,7 +61,7 @@ std::string ResourceManager::SaveGUID(std::string path) {
 		return 0;
 	}
 
-	file << guid << ":" << "type" << path << "\n";
+	file << guid << ":" << "type:" << path << "\n";
 
 	return guid;
 
