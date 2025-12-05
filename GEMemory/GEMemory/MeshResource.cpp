@@ -17,8 +17,6 @@ int MeshResource::GetRef() {
 }
 
 void MeshResource::UnLoad() {
-	/*int ref = Resource::GetRef();
-	if (ref == 1) {
+	UnloadModel(_model);
 
-	}*/
 }

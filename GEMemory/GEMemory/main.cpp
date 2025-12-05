@@ -44,7 +44,7 @@ int main() {
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		BeginMode3D(camera);
-
+		
 		DrawModel(meshroom1->GetModel(), {3,2,0}, 1.0f, RED);
 		DrawModel(meshroom2->GetModel(), {-3,2,0}, 1.0f, BLUE);
 		//DrawModel(cubeModel, { 0.0f, 1.0f, 0.0f }, 1.0f, BLUE);
@@ -54,24 +54,32 @@ int main() {
 		// --- 3D Mode slutar här ---
 		EndDrawing();
 		
-		meshroom1->UnLoad();
 
 		//DrawModel(LoadModelFromMesh(GenMeshCube(5, 4, 5)), Vector3{ 0,0,-1 }, 1.0f, BLUE);
 		auto t1 = std::chrono::high_resolution_clock::now(); 
 		std::chrono::duration<double> duration = t1 - t0;
 		time += duration.count();
 
-		if (time >= 5) {
+		//std::cout << "mesh1 " << meshroom1->GetRef() << std::endl;
+		std::cout << "mesh2 " << meshroom2->GetRef() << std::endl;
+
+	/*	if (time >= 5 && time < 6) {
 
 			if (!RM.UnLoad("69f74b0d-b87d-44b0-bb89-4fb94b5243c8")) {
 				std::cerr << "ERROR: Trying to UnLoad already unloaded content" << std::endl;
 			}
-			time = 0;
+			time = 6;
 		}
+		if (time >= 10) {
+			if (!RM.UnLoad("69f74b0d-b87d-44b0-bb89-4fb94b5243c8")) {
+				std::cerr << "ERROR: Trying to UnLoad already unloaded content" << std::endl;
+			}
+		}*/
+
 	}
 
-	delete meshroom1;
-	delete meshroom2;
+
+	
 	UnloadModel(cubeModel);
 	CloseWindow();
 

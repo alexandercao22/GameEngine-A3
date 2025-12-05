@@ -137,6 +137,7 @@ bool ResourceManager::UnLoad(std::string GUID) {
 	}
 	int ref = res->GetRef();
 	if (ref == 1) {
+		CachedResources[GUID]->UnLoad();
 		CachedResources.erase(GUID);
 		return true;
 	}
