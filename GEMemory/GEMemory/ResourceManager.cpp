@@ -137,6 +137,16 @@ std::string ResourceManager::SaveGUID(std::string path) {
 		return "";
 	}
 
-	file << guid << ":" << "type:" << path << "\n";
+	std::string type = "";
+	if (path.find(".obj") != std::string::npos ||
+		path.find(".gltf") != std::string::npos) {
+		type = "Mesh";
+	}
+	else if (path.find(".png") != std::string::npos ||
+		path.find(".jpg") != std::string::npos) {
+		type = "Texture";
+	}
+
+	file << guid << ":" << type << ":" << path << "\n";
 	return guid;
 }
