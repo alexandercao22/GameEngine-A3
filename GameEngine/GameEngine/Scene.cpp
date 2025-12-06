@@ -22,9 +22,14 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	_camera.fovy = 90.0f;
 	_camera.projection = CAMERA_PERSPECTIVE;
 
-	_GUIDs.push_back("69f74b0d-b87d-44b0-bb89-4fb94b5243c8");
-	_GUIDs.push_back("69f74b0d-b87d-44b0-bb89-4fb94b5243c8");
-	_GUIDs.push_back("69f74b0d-b87d-44b0-bb89-4fb94b5243c8");
+	Entity ent;
+	ent.AddGUID("69f74b0d-b87d-44b0-bb89-4fb94b5243c8");
+	ent.GetTransform()->translation.x = 0.0f;
+	_entities.push_back(ent);
+	ent.GetTransform()->translation.x = 2.0f;
+	_entities.push_back(ent);
+	ent.GetTransform()->translation.x = 4.0f;
+	_entities.push_back(ent);
 
 	return true;
 }
@@ -59,11 +64,13 @@ bool Scene::RenderUpdate()
 		UpdateCamera(&_camera, CAMERA_FREE);
 	}
 
-	float x = 0.0f;
-	for (std::string guid : _GUIDs) {
-		if (ResourceManager::Instance().GetGUIDType(guid) == "Mesh") {
-			MeshResource *mesh = (MeshResource *)ResourceManager::Instance().Load(guid);
-			DrawModel(mesh->GetModel(), { x++, 0, 0 }, 1.0f, RED);
+	for (Entity ent : _entities) {
+		Transform *transform = ent.GetTransform();
+		for (std::string guid : ent.GetGUIDs()) {
+			if (ResourceManager::Instance().GetGUIDType(guid) == "Mesh") {
+				MeshResource *mesh = (MeshResource *)ResourceManager::Instance().Load(guid);
+				DrawModel(mesh->GetModel(), transform->translation, transform->scale.x, RED);
+			}
 		}
 	}
 

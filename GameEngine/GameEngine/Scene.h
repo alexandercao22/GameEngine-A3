@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Entity.h"
+
 #include <vector>
 #include <string>
 #include "raylib.h"
@@ -8,6 +10,8 @@ class Scene
 {
 private:
 	std::vector<std::string> _GUIDs; // GUIDs needed for this specific scene
+
+	std::vector<Entity> _entities;
 
 	Camera3D _camera = { 0 };
 	bool _showCursor = true;
