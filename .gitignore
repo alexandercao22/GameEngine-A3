@@ -400,8 +400,4 @@ FodyWeavers.xsd
 *.sln.iml
 
 # Custom ignores
-int/
-lib/
-bin/*.exe
-bin/*.pbd
-bin/*.ini
+!GameEngine/GameEngine/Resources/*
