@@ -110,7 +110,7 @@ namespace GuidUtils {
 		fs::path metaPath = assetPath;
 		metaPath += ".meta";
 
-		if (fs::is_regular_file(assetPath)) {
+		if (fs::is_regular_file(metaPath)) {
 			std::cerr << "GuidUtils::GetOrGenerateGuid(): Meta file already exists" << std::endl;
 			return false;
 		}
