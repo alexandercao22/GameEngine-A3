@@ -210,8 +210,7 @@ bool PackageManager::Unpack(const std::string& source, const std::string& target
 		TOCEntry entry;
 
 		// The GUID
-		std::string guid;
-		guid.resize(GUID_STR_LENGTH);
+		entry.guid.resize(GUID_STR_LENGTH);
 		in.read(entry.guid.data(), GUID_STR_LENGTH);
 
 		// The length of the key
@@ -219,7 +218,6 @@ bool PackageManager::Unpack(const std::string& source, const std::string& target
 		in.read(reinterpret_cast<char*>(&keyLength), sizeof(keyLength));
 
 		// The key
-		std::string key;
 		entry.key.resize(keyLength);
 		in.read(entry.key.data(), keyLength);
 
