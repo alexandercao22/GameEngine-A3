@@ -4,6 +4,8 @@
 #include <Windows.h>
 #include <ShObjIdl.h>
 #include <string>
+#include <filesystem>
+#include <iostream>
 
 std::string OpenFileDialog()
 {
@@ -42,3 +44,25 @@ std::string OpenFileDialog()
     return result;
 }
 
+void CopyFileToResources(const std::string &srcPath, const std::string &destFolder) {
+    try {
+        // Extract filename from the path
+        std::filesystem::path source(srcPath);
+        std::filesystem::path destination = std::filesystem::path(destFolder) / source.filename();
+
+        // Create directory if needed
+        std::filesystem::create_directories(destFolder);
+
+        // Copy (overwrite if exists)
+        std::filesystem::copy_file(
+            source,
+            destination,
+            std::filesystem::copy_options::skip_existing
+        );
+
+        std::cout << "Copied to: " << destination << std::endl;
+    }
+    catch (std::exception &e) {
+        std::cerr << "Copy failed: " << e.what() << std::endl;
+    }
+}
