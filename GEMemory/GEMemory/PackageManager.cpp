@@ -183,8 +183,8 @@ bool PackageManager::Unpack(const std::string& source, const std::string& target
 
 		// The key
 		std::string key;
-		key.resize(keyLength);
-		in.read(key.data(), keyLength);
+		entry.key.resize(keyLength);
+		in.read(entry.key.data(), keyLength);
 
 		// The entry data (PackageEntry)
 		in.read(reinterpret_cast<char*>(&entry.packageEntry), sizeof(entry.packageEntry));
