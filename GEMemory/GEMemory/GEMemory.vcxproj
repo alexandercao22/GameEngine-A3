@@ -146,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BuddyAllocator.h" />
+    <ClInclude Include="GuidUtils.h" />
     <ClInclude Include="Interface.h" />
     <ClInclude Include="MemoryTracker.h" />
     <ClInclude Include="Objects.h" />
