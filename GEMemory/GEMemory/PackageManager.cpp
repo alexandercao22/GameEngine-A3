@@ -57,6 +57,12 @@ bool PackageManager::Pack(const std::string& source, const std::string& target)
 	// Output file (package)
 	std::string packageName = sourcePath.stem().generic_string() + ".gepak";
 	targetPath = targetPath / packageName;
+
+	if (fs::is_regular_file(targetPath)) {
+		std::cerr << "PackageManager::Pack(): Package already exists in target directory" << std::endl;
+		return false;
+	}
+
 	std::ofstream out(targetPath, std::ios::binary);
 	if (!out) { 
 		std::cerr << "PackageManager::Pack(): Unable to create output file" << std::endl;
