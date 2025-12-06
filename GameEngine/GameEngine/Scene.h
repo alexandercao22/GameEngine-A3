@@ -11,6 +11,8 @@ private:
 
 	Camera3D _camera = { 0 };
 	bool _showCursor = true;
+	unsigned int _width = 1280;
+	unsigned int _height = 720;
 
 public:
 	Scene() = default;

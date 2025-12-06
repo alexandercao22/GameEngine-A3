@@ -8,7 +8,10 @@
 
 bool Scene::Init(unsigned int width, unsigned int height)
 {
-	InitWindow(width, height, "Game Engine Assignment 3");
+	_width = width;
+	_height = height;
+
+	InitWindow(_width, _height, "Game Engine Assignment 3");
 	SetTargetFPS(60);
 	rlImGuiSetup(true);
 
@@ -38,6 +41,10 @@ bool Scene::RenderUpdate()
 	rlImGuiBegin();
 	BeginMode3D(_camera);
 
+	ImGui::Begin("ImGui");
+	ImGui::SetWindowPos(ImVec2(0.0f, 0.0f));
+	ImGui::SetWindowSize(ImVec2(200.0f, _height));
+
 	if (IsKeyPressed(KEY_C)) {
 		_showCursor = !_showCursor;
 		if (_showCursor) {
@@ -63,6 +70,7 @@ bool Scene::RenderUpdate()
 	DrawGrid(20, 1.0f);
 
 	EndMode3D();
+	ImGui::End();
 	rlImGuiEnd();
 	EndDrawing();
 
