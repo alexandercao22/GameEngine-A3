@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
-inline constexpr char SIGNATURE[6] = "GEPAK"; // Signature for files packaged by this package manager
+inline constexpr char SIGNATURE[8] = "GEPAKV0"; // Signature for files packaged by this package manager
 
 struct PackageHeader {
 	char signature[5];
