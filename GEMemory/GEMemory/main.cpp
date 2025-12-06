@@ -1,7 +1,6 @@
 #include "TestCases.h"
 #include "Interface.h"
 #include "PackageManager.h"
-#include "GuidUtils.h"
 
 #include "raylib.h"
 
@@ -21,19 +20,17 @@ int main() {
 	//TestAll();
 
 	// PackageManager tests
-	//PackageManager pm;
-	//pm.Pack("../GEMemory/Resources/level1", "../GEMemory/Resources");
+	PackageManager pm;
+	pm.Pack("../GEMemory/Resources/level2", "../GEMemory/Resources");
 	//pm.Unpack("../GEMemory/Resources/level1.gepak", "../GEMemory/Resources");
-	//pm.MountPackage("../GEMemory/Resources/level1.gepak");
-	//AssetData asset;
-	//pm.LoadAsset("293088.png", "level1", asset);
-	//pm.UnmountPackage("level1");
-
-	std::string guid;
-	GuidUtils::GetOrGenerateGuid(std::filesystem::path("../GEMemory/Resources/level1/293088.png"), guid);
-	std::cout << "Generated GUID: " << guid << std::endl;
-
-
+	pm.MountPackage("../GEMemory/Resources/level1.gepak");
+	pm.MountPackage("../GEMemory/Resources/level2.gepak");
+	AssetData asset;
+	pm.LoadAssetByPath("293088.png", asset);
+	pm.LoadAssetByGuid("f0ea19eb-e072-403b-bda6-fd6a78c8b92a", asset);
+	pm.UnmountPackage();
+	pm.UnmountPackage("level1");
+	pm.UnmountPackage();
 
 	return 0;
 }
