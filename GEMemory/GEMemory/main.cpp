@@ -1,5 +1,6 @@
 #include "TestCases.h"
 #include "Interface.h"
+#include "PackageManager.h"
 
 #include "raylib.h"
 
@@ -18,15 +19,14 @@ int main() {
 	//TestAll();
 
 
-	// Filesystem testing
-
-	std::string relative = "Hello.csv";
-	std::filesystem::path relativePath(relative);
-	std::filesystem::path p("/project/assets");
-
-	std::filesystem::path fullPath = p / relativePath;
-	std::cout << fullPath.string() << std::endl;
-	
+	// PackageManager tests
+	PackageManager pm;
+	//pm.Pack("../GEMemory/Resources/level1", "../GEMemory/Resources");
+	pm.Unpack("../GEMemory/Resources/level1.gepak", "../GEMemory/Resources");
+	pm.MountPackage("../GEMemory/Resources/level1.gepak");
+	AssetData asset;
+	pm.LoadAsset("293088.png", "level1", asset);
+	pm.UnmountPackage("level1");
 
 	return 0;
 }
