@@ -400,4 +400,4 @@ FodyWeavers.xsd
 *.sln.iml
 
 # Custom ignores
-!GEMemory/GEMemory/Resources/*
+!GameEngine/GameEngine/Resources/*
