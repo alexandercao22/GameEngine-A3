@@ -41,7 +41,7 @@ private:
 
 public:
 	PackageManager() = default;
-	~PackageManager();
+	~PackageManager() = default;
 
 	bool Pack(const std::string& source, const std::string& target);
 	bool Unpack(const std::string& source, const std::string& target);
