@@ -142,7 +142,6 @@
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="rlImGui.cpp" />
     <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="StackAllocator.cpp" />
     <ClCompile Include="TestCases.cpp" />
   </ItemGroup>
@@ -156,7 +155,6 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Scene.h" />
-    <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="StackAllocator.h" />
     <ClInclude Include="TestCases.h" />
