@@ -8,19 +8,6 @@
 #include <iostream>
 #include "Resource.h"
 
-
-class GUID {
-public:
-	std::string id;
-
-	GUID() = default;
-	GUID(const std::string& value) : id(value) {}
-
-	bool operator== (const GUID& other) const {
-		return id == other.id;
-	}
-};
-
 class ResourceManager 
 {
 private:
