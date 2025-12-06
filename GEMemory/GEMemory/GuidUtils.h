@@ -8,7 +8,7 @@
 
 namespace GuidUtils {
 	// Returns a new randomized GUID
-	std::string GenerateGuid() 
+	inline std::string GenerateGuid()
 	{
 		thread_local std::random_device rd;
 		thread_local std::mt19937_64 gen(rd());
@@ -49,9 +49,8 @@ namespace GuidUtils {
 
 	// Gets the GUID of an asset if it has a corresponding .meta file
 	// If no .meta file is found, it will be created and a new GUID will be written into it
-	// Returns the GUID of the asset
 	namespace fs = std::filesystem;
-	bool GetOrGenerateGuid(const std::filesystem::path& assetPath, std::string& guid) 
+	inline bool GetOrGenerateGuid(const std::filesystem::path& assetPath, std::string& guid)
 	{
 		// Path validity checks
 		if (!fs::is_regular_file(assetPath)) {
