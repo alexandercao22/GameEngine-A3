@@ -416,7 +416,7 @@ bool PackageManager::UnmountPackage(const std::string& packageKey)
 bool PackageManager::LoadAssetByGuid(const std::string& guid, AssetData& asset)
 {
 	for (size_t i = _mountOrder.size(); i != 0; --i) {
-		std::string packageKey = _mountOrder.at(i);
+		std::string packageKey = _mountOrder.at(i - 1);
 
 		MountedPackage& mountedPackage = _mountedPackages.find(packageKey)->second;
 		auto pair = mountedPackage.tocByGuid.find(guid);
@@ -441,7 +441,7 @@ bool PackageManager::LoadAssetByGuid(const std::string& guid, AssetData& asset)
 bool PackageManager::LoadAssetByPath(const std::string& path, AssetData& asset)
 {
 	for (size_t i = _mountOrder.size(); i != 0; --i) {
-		std::string packageKey = _mountOrder.at(i);
+		std::string packageKey = _mountOrder.at(i - 1);
 
 		MountedPackage& mountedPackage = _mountedPackages.find(packageKey)->second;
 		auto pair = mountedPackage.tocByPath.find(path);
