@@ -145,6 +145,7 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="StackAllocator.cpp" />
     <ClCompile Include="TestCases.cpp" />
+    <ClCompile Include="TextureResource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BuddyAllocator.h" />
@@ -160,6 +161,7 @@
     <ClInclude Include="Settings.h" />
     <ClInclude Include="StackAllocator.h" />
     <ClInclude Include="TestCases.h" />
+    <ClInclude Include="TextureResource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
