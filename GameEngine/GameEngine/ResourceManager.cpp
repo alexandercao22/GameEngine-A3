@@ -117,6 +117,11 @@ bool ResourceManager::Unload(std::string guid) {
 	}
 }
 
+std::string ResourceManager::GetGUIDType(std::string guid)
+{
+	return _GUIDtoType[guid];
+}
+
 std::string ResourceManager::SaveGUID(std::string path) {
 	// Checking if asset already exists in folder to prohibit duplication
 	for (auto paths : _PathtoGUID) {
