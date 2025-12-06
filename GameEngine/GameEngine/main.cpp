@@ -1,7 +1,7 @@
 #include "TestCases.h"
 #include "Interface.h"
 #include "ResourceManager.h"
-#include "SceneManager.h"
+#include "Scene.h"
 
 #include "raylib.h"
 #include <chrono>
@@ -11,7 +11,7 @@ int main() {
 
 	ResourceManager::Instance().Init();
 
-	SceneManager scene;
+	Scene scene;
 	scene.Init();
 
 	while (!WindowShouldClose()) {
