@@ -7,6 +7,7 @@
 
 #include "ResourceManager.h"
 #include "MeshResource.h"
+#include "TextureResource.h"
 
 bool Scene::RenderInterface()
 {
@@ -58,12 +59,18 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	_camera.projection = CAMERA_PERSPECTIVE;
 
 	Entity ent;
-	ent.AddGUID("69f74b0d-b87d-44b0-bb89-4fb94b5243c8");
+	ent.AddGUID("69f74b0d-b87d-44b0-bb89-4fb94b5243c8"); // mushroom.obj
 	ent.GetTransform()->translation.x = 0.0f;
 	_entities.push_back(ent);
 	ent.GetTransform()->translation.x = 2.0f;
 	_entities.push_back(ent);
 	ent.GetTransform()->translation.x = 4.0f;
+	_entities.push_back(ent);
+
+	ent = Entity();
+	ent.AddGUID("90c94e91-dd63-441f-9372-b12a77b8036a"); // cubeWithTexture.obj
+	ent.AddGUID("2fe16579-8532-47b5-a6d4-a36f22611c3c"); // cubemaps_skybox.png
+	ent.GetTransform()->translation.y = 4.0f;
 	_entities.push_back(ent);
 
 	return true;
@@ -101,11 +108,23 @@ bool Scene::RenderUpdate()
 
 	for (Entity ent : _entities) {
 		Transform *transform = ent.GetTransform();
+		MeshResource *mesh = nullptr;
+		TextureResource *texture = nullptr;
 		for (std::string guid : ent.GetGUIDs()) {
 			if (ResourceManager::Instance().GetGUIDType(guid) == "Mesh") {
-				MeshResource *mesh = (MeshResource *)ResourceManager::Instance().Load(guid);
-				DrawModel(mesh->GetModel(), transform->translation, transform->scale.x, RED);
+				mesh = (MeshResource *)ResourceManager::Instance().Load(guid);
 			}
+			else if (ResourceManager::Instance().GetGUIDType(guid) == "Texture") {
+				texture = (TextureResource *)ResourceManager::Instance().Load(guid);
+			}
+		}
+
+		if (texture != nullptr) {
+			SetMaterialTexture(&mesh->GetModel().materials[0], MATERIAL_MAP_DIFFUSE, texture->GetTexture());
+			DrawModel(mesh->GetModel(), transform->translation, transform->scale.x, WHITE);
+		}
+		else {
+			DrawModel(mesh->GetModel(), transform->translation, transform->scale.x, RED);
 		}
 	}
 

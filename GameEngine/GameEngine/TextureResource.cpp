@@ -10,9 +10,10 @@ TextureResource *TextureResource::LoadFromDisk(std::string path)
 
 void TextureResource::UnLoad()
 {
+	UnloadTexture(_texture);
 }
 
 Texture2D TextureResource::GetTexture()
 {
-	return Texture2D();
+	return _texture;
 }
