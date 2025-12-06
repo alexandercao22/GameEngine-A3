@@ -103,6 +103,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)Libraries\Includes;%(AdditionalDependencies)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -132,10 +133,12 @@
     <ClCompile Include="imgui_tables.cpp" />
     <ClCompile Include="imgui_widgets.cpp" />
     <ClCompile Include="Interface.cpp" />
+    <ClCompile Include="Libraries\lz4\lz4.c" />
     <ClCompile Include="main.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Libraries\Includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="MemoryTracker.cpp" />
+    <ClCompile Include="PackageManager.cpp" />
     <ClCompile Include="PoolAllocator.cpp" />
     <ClCompile Include="rlImGui.cpp" />
     <ClCompile Include="StackAllocator.cpp" />
@@ -146,6 +149,7 @@
     <ClInclude Include="Interface.h" />
     <ClInclude Include="MemoryTracker.h" />
     <ClInclude Include="Objects.h" />
+    <ClInclude Include="PackageManager.h" />
     <ClInclude Include="PoolAllocator.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="StackAllocator.h" />
