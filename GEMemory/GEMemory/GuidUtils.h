@@ -126,6 +126,10 @@ namespace GuidUtils {
 			return false;
 		}
 
+		if (DEBUG) {
+			std::cout << "Created meta file for " << assetPath << std::endl;
+		}
+
 		return true;
 	}
 }

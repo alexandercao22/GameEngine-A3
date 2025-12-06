@@ -357,7 +357,7 @@ bool PackageManager::MountPackage(const std::string& source)
 	_mountOrder.push_back(packageKey);
 
 	if (DEBUG) {
-		std::cout << "Mounted package: " << packageKey << std::endl;
+		std::cout << "Mounted package: |" << packageKey << "| with priority: " << _mountOrder.size() << std::endl;
 	}
 
 	return true;
@@ -426,7 +426,7 @@ bool PackageManager::LoadAssetByGuid(const std::string& guid, AssetData& asset)
 			}
 
 			if (DEBUG) {
-				std::cout << "Loaded asset with GUID: " << guid << std::endl;
+				std::cout << "Loaded asset with GUID: |" << guid << "| From package: " << packageKey << std::endl;
 			}
 			return true;
 		}
@@ -451,7 +451,7 @@ bool PackageManager::LoadAssetByPath(const std::string& path, AssetData& asset)
 			}
 
 			if (DEBUG) {
-				std::cout << "Loaded asset with path: " << path << std::endl;
+				std::cout << "Loaded asset with path: |" << path << "| From package: " << packageKey << std::endl;
 			}
 			return true;
 		}
