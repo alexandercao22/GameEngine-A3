@@ -18,6 +18,8 @@ private:
 	unsigned int _width = 1280;
 	unsigned int _height = 720;
 
+	bool RenderInterface();
+
 public:
 	Scene() = default;
 	~Scene() = default;

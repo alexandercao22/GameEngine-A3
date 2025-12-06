@@ -6,6 +6,18 @@
 #include "ResourceManager.h"
 #include "MeshResource.h"
 
+bool Scene::RenderInterface()
+{
+	ImGui::Begin("ImGui");
+	ImGui::SetWindowPos(ImVec2(0.0f, 0.0f));
+	ImGui::SetWindowSize(ImVec2(200.0f, _height));
+
+
+
+	ImGui::End();
+	return true;
+}
+
 bool Scene::Init(unsigned int width, unsigned int height)
 {
 	_width = width;
@@ -46,9 +58,9 @@ bool Scene::RenderUpdate()
 	rlImGuiBegin();
 	BeginMode3D(_camera);
 
-	ImGui::Begin("ImGui");
-	ImGui::SetWindowPos(ImVec2(0.0f, 0.0f));
-	ImGui::SetWindowSize(ImVec2(200.0f, _height));
+	if (!RenderInterface()) {
+		return false;
+	}
 
 	if (IsKeyPressed(KEY_C)) {
 		_showCursor = !_showCursor;
@@ -77,7 +89,6 @@ bool Scene::RenderUpdate()
 	DrawGrid(20, 1.0f);
 
 	EndMode3D();
-	ImGui::End();
 	rlImGuiEnd();
 	EndDrawing();
 
