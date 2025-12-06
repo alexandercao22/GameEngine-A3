@@ -1,6 +1,7 @@
 #include "ResourceManager.h"
 
 #include "MeshResource.h"
+#include "TextureResource.h"
 
 std::string GenerateGUID() {
 	static std::random_device rd;
@@ -43,6 +44,9 @@ Resource *ResourceManager::LoadFromDisk(std::string path) {
 	Resource *res = nullptr;
 	if (type == "Mesh") {
 		res = new MeshResource();
+	}
+	else if (type == "Texture") {
+		res = new TextureResource();
 	}
 	res->LoadFromDisk(path);
 	_cachedResources.insert({ guid, res });
