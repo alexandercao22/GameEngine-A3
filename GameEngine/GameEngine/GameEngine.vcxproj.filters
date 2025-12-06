@@ -81,6 +81,9 @@
     <ClCompile Include="TextureResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WinFileDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Objects.h">
@@ -123,6 +126,9 @@
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="TextureResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WinFileDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

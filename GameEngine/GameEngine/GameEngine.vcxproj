@@ -103,6 +103,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)Libraries\Includes;%(AdditionalDependencies)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,6 +147,7 @@
     <ClCompile Include="StackAllocator.cpp" />
     <ClCompile Include="TestCases.cpp" />
     <ClCompile Include="TextureResource.cpp" />
+    <ClCompile Include="WinFileDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BuddyAllocator.h" />
@@ -162,6 +164,7 @@
     <ClInclude Include="StackAllocator.h" />
     <ClInclude Include="TestCases.h" />
     <ClInclude Include="TextureResource.h" />
+    <ClInclude Include="WinFileDialog.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
