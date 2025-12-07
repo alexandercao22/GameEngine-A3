@@ -1,10 +1,17 @@
 #include "TextureResource.h"
 
+#include <iostream>
+
 TextureResource *TextureResource::LoadFromDisk(std::string path)
 {
 	Resource::RefAdd();
 
-	_texture = LoadTexture(path.c_str());
+	Texture2D texture = LoadTexture(path.c_str());
+	if (!IsTextureValid(texture)) {
+		std::cerr << "TextureResource::LoadFromDisk(): Texture was invalid: " << path << std::endl;
+		return nullptr;
+	}
+	_texture = texture;
 	return this;
 }
 

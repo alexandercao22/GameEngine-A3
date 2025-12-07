@@ -1,11 +1,13 @@
 #include "Resource.h"
 
 void Resource::RefAdd() {
-	ReferenceCount++;
+	_refCount++;
 }
+
 void Resource::RefSub() {
-	ReferenceCount--;
+	_refCount--;
 }
+
 int Resource::GetRef() {
-	return ReferenceCount;
+	return _refCount;
 }

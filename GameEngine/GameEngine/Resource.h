@@ -1,8 +1,11 @@
 #pragma once
+
 #include <string>
+
 class Resource {
 private:
-	int ReferenceCount = 0;
+	int _refCount = 0;
+
 public:
 	virtual Resource* LoadFromDisk(std::string id) = 0;
 	virtual void UnLoad() = 0;
