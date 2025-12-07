@@ -73,6 +73,14 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	ent.GetTransform()->translation.y = 4.0f;
 	_entities.push_back(ent);
 
+	ent = Entity();
+	//ent.AddGUID(ResourceManager::Instance().SaveGUID("Resources/Duck.gltf"));
+	ent.AddGUID("27471003-7f27-42e3-a791-c159b33f5198");
+	ent.GetTransform()->translation.x = 4.0f;
+	ent.GetTransform()->translation.y = 4.0f;
+	ent.GetTransform()->translation.z = 4.0f;
+	_entities.push_back(ent);
+
 	return true;
 }
 
