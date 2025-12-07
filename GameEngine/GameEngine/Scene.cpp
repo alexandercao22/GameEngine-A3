@@ -129,10 +129,12 @@ bool Scene::RenderUpdate()
 
 		if (texture != nullptr) {
 			SetMaterialTexture(&mesh->GetModel().materials[0], MATERIAL_MAP_DIFFUSE, texture->GetTexture());
-			DrawModel(mesh->GetModel(), transform->translation, transform->scale.x, WHITE);
+			Vector3 rotation = { transform->rotation.x, transform->rotation.y, transform->rotation.z };
+			DrawModelEx(mesh->GetModel(), transform->translation, rotation, transform->rotation.w, transform->scale, WHITE);
 		}
 		else {
-			DrawModel(mesh->GetModel(), transform->translation, transform->scale.x, RED);
+			Vector3 rotation = { transform->rotation.x, transform->rotation.y, transform->rotation.z };
+			DrawModelEx(mesh->GetModel(), transform->translation, rotation, transform->rotation.w, transform->scale, RED);
 		}
 	}
 
