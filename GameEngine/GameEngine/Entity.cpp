@@ -2,7 +2,9 @@
 
 void Entity::AddGUID(std::string guid)
 {
-	_GUIDs.push_back(guid);
+	if (guid.length() == 36) {
+		_GUIDs.push_back(guid);
+	}
 }
 
 Transform *Entity::GetTransform()
