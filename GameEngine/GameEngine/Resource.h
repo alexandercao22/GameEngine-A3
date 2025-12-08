@@ -11,6 +11,8 @@ protected:
 	AssetData _data;
 
 public:
+	virtual ~Resource() = default;
+
 	virtual Resource* LoadFromDisk(std::string id) = 0;
 	virtual void UnLoad() = 0;
 	//virtual GetProperties();
@@ -21,5 +23,4 @@ public:
 
 	void SetData(AssetData& assetData);
 
-	virtual ~Resource() = default;
 };

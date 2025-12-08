@@ -90,6 +90,9 @@
     <ClCompile Include="Libraries\lz4\lz4.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EntityEnemy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Objects.h">
@@ -139,6 +142,15 @@
     </ClInclude>
     <ClInclude Include="PackageManager.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityEnemy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GuidUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OBJ_Loader.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
