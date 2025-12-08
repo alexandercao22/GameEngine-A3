@@ -27,7 +27,7 @@ bool Scene::RenderInterface()
 			std::string file = "Resources/" + path.substr(backslash, path.length() - backslash);
 			std::cout << file << std::endl;
 
-			ResourceManager::Instance().SaveGUID(file);
+			//ResourceManager::Instance().SaveGUID(file);
 		}
 	}
 
@@ -35,7 +35,7 @@ bool Scene::RenderInterface()
 	ImGui::InputText("File", buf, IM_ARRAYSIZE(buf));
 	if (ImGui::Button("Load")) {
 		std::string path = "Resource/" + std::string(buf);
-		ResourceManager::Instance().SaveGUID(path);
+		//ResourceManager::Instance().SaveGUID(path);
 	}
 
 	ImGui::End();
@@ -47,6 +47,8 @@ Scene::~Scene()
 	for (Entity *ent : _entities) {
 		delete ent;
 	}
+
+	ResourceManager::Instance().GetPackageManager()->UnmountPackage("Resources/Mesh.gepak");
 }
 
 bool Scene::Init(unsigned int width, unsigned int height)
@@ -57,6 +59,8 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	InitWindow(_width, _height, "Game Engine Assignment 3");
 	SetTargetFPS(60);
 	rlImGuiSetup(true);
+
+	ResourceManager::Instance().GetPackageManager()->MountPackage("Resources/Mesh.gepak");
 
 	// Initialize camera
 	_camera.position = { 0.0f, 5.0f, 10.0f };

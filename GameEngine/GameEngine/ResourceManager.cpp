@@ -23,7 +23,7 @@ ResourceManager::~ResourceManager() {
 	}
 }
 
-bool ResourceManager::LoadResource(std::string guid, Resource* resource) {
+bool ResourceManager::LoadResource(std::string guid, Resource *&resource) {
 	auto pair = _cachedResources.find(guid);
 	if (pair != _cachedResources.end()) {
 		// Resource already exists in cache
@@ -36,8 +36,8 @@ bool ResourceManager::LoadResource(std::string guid, Resource* resource) {
 		AssetData data;
 		if (!_packageManager.LoadAssetByGuid(guid, data)) {
 			std::cerr << "ResourceManager::LoadResource(): Could not load resource" << std::endl;
+			return false;
 		}
-		Resource* resource;
 		resource->SetData(data);
 
 		resource->RefAdd();
@@ -66,6 +66,11 @@ bool ResourceManager::UnloadResource(std::string guid) {
 		std::cerr << "ResourceManager::UnloadResource(): Failed unloading resource with GUID: " << guid << std::endl;
 		return false;
 	}
+}
+
+PackageManager *ResourceManager::GetPackageManager()
+{
+	return &_packageManager;
 }
 
 //std::string ResourceManager::GetGUIDType(std::string guid)

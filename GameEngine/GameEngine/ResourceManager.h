@@ -34,8 +34,10 @@ public:
 	ResourceManager() = default;
 	~ResourceManager();
 
-	bool LoadResource(std::string guid, Resource* resource);
+	bool LoadResource(std::string guid, Resource *&resource);
 	bool UnloadResource(std::string guid);
+
+	PackageManager *GetPackageManager();
 
 	//std::string GetGUIDType(std::string guid);
 	//std::string SaveGUID(std::string path);

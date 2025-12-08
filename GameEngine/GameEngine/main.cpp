@@ -30,12 +30,12 @@ int main() {
 
 	// PackageManager tests
 	//PackageManager pm;
-	//pm.Pack("../GameEngine/Resources/level2", "../GameEngine/Resources");
+	//pm.Pack("../GameEngine/Resources/Mesh", "../GameEngine/Resources");
 	////pm.Unpack("../GameEngine/Resources/level1.gepak", "../GameEngine/Resources");
-	//pm.MountPackage("../GameEngine/Resources/level1.gepak");
+	//pm.MountPackage("../GameEngine/Resources/Mesh.gepak");
 	//pm.MountPackage("../GameEngine/Resources/level2.gepak");
 	//AssetData asset;
-	//pm.LoadAssetByPath("293088.png", asset);
+	//pm.LoadAssetByPath("Duck1.obj", asset);
 	//pm.LoadAssetByGuid("f0ea19eb-e072-403b-bda6-fd6a78c8b92a", asset);
 	//pm.UnmountPackage();
 	//pm.UnmountPackage("level1");
