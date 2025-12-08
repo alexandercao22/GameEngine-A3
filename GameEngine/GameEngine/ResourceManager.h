@@ -7,18 +7,19 @@
 #include <fstream>
 #include <iostream>
 #include "Resource.h"
+#include "PackageManager.h"
 
 class ResourceManager 
 {
 private:
-	// List of GUIDS
-	std::unordered_map<std::string, std::string> _GUIDtoPath;
-	std::unordered_map<std::string, std::string> _PathtoGUID;
-	std::unordered_map<std::string, std::string> _GUIDtoType;
-	// List of cached Resources
-	std::unordered_map<std::string, Resource*> _cachedResources;
-
-	Resource* LoadFromDisk(std::string path);
+	//// List of GUIDS
+	//std::unordered_map<std::string, std::string> _GUIDtoPath;
+	//std::unordered_map<std::string, std::string> _PathtoGUID;
+	//std::unordered_map<std::string, std::string> _GUIDtoType;
+	//Resource* LoadFromDisk(std::string path);
+	
+	PackageManager _packageManager; // Manages packages and resource loading from packages
+	std::unordered_map<std::string, Resource*> _cachedResources; // Currently used resources with reference counts
 
 public:
 	// Singleton instance
@@ -33,12 +34,9 @@ public:
 	ResourceManager() = default;
 	~ResourceManager();
 
-	bool Init();
+	bool LoadResource(std::string guid, Resource*& resource);
+	bool UnloadResource(std::string guid);
 
-	Resource* Load(std::string guid);
-	bool Unload(std::string guid);
-
-	std::string GetGUIDType(std::string guid);
-
-	std::string SaveGUID(std::string path);
+	//std::string GetGUIDType(std::string guid);
+	//std::string SaveGUID(std::string path);
 };

@@ -1,9 +1,11 @@
 #pragma once
 
 #include <string>
+#include "PackageManager.h"
 
 class Resource {
 private:
+	AssetData _data;
 	int _refCount = 0;
 
 public:
@@ -14,6 +16,8 @@ public:
 	virtual void RefAdd();
 	virtual void RefSub();
 	virtual int GetRef();
-	virtual ~Resource() = default;
 
+	void SetData(AssetData& assetData);
+
+	virtual ~Resource() = default;
 };
