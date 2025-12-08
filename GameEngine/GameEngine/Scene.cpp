@@ -66,14 +66,17 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	_camera.projection = CAMERA_PERSPECTIVE;
 
 	EntityEnemy *ent = new EntityEnemy;
+	ent->Init();
 	ent->GetTransform()->translation.x = 4.0f;
 	_entities.push_back(ent);
 
 	ent = new EntityEnemy;
+	ent->Init();
 	ent->GetTransform()->translation.y = 4.0f;
 	_entities.push_back(ent);
 
 	ent = new EntityEnemy;
+	ent->Init();
 	ent->GetTransform()->translation.x = 4.0f;
 	ent->GetTransform()->translation.y = 4.0f;
 	ent->GetTransform()->translation.z = 4.0f;

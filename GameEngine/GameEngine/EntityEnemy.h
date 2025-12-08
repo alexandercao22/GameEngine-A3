@@ -7,7 +7,7 @@ private:
 	float _health = 100.0f;
 
 public:
-	EntityEnemy();
+	EntityEnemy() = default;
 	~EntityEnemy();
 
 	bool Init() override;
