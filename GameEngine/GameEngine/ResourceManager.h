@@ -1,0 +1,44 @@
+#pragma once
+#include <unordered_map>
+#include <string>
+#include <random>
+#include <sstream>
+#include <iomanip>
+#include <fstream>
+#include <iostream>
+#include "Resource.h"
+
+class ResourceManager 
+{
+private:
+	// List of GUIDS
+	std::unordered_map<std::string, std::string> _GUIDtoPath;
+	std::unordered_map<std::string, std::string> _PathtoGUID;
+	std::unordered_map<std::string, std::string> _GUIDtoType;
+	// List of cached Resources
+	std::unordered_map<std::string, Resource*> _cachedResources;
+
+	Resource* LoadFromDisk(std::string path);
+
+public:
+	// Singleton instance
+	static ResourceManager &Instance() {
+		static ResourceManager instance;
+		return instance;
+	}
+	// Copy prevention
+	ResourceManager(const ResourceManager &) = delete;
+	ResourceManager &operator=(const ResourceManager &) = delete;
+
+	ResourceManager() = default;
+	~ResourceManager();
+
+	bool Init();
+
+	Resource* Load(std::string guid);
+	bool Unload(std::string guid);
+
+	std::string GetGUIDType(std::string guid);
+
+	std::string SaveGUID(std::string path);
+};
