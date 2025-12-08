@@ -12,8 +12,6 @@
 int main() {
 	//Interface interface;
 
-	ResourceManager::Instance().Init();
-
 	Scene scene;
 	scene.Init();
 
