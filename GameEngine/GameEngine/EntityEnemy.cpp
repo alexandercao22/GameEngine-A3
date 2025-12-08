@@ -5,23 +5,32 @@
 
 EntityEnemy::~EntityEnemy()
 {
-    ResourceManager::Instance().UnloadResource("27471003-7f27-42e3-a791-c159b33f5198");
+    ResourceManager::Instance().UnloadResource("5f1e388c-39c4-471d-bfa2-727ab986dd1c");
     ResourceManager::Instance().UnloadResource("");
+    delete _mesh;
+    delete _texture;
 }
 
 bool EntityEnemy::Init()
 {
-    if (!ResourceManager::Instance().LoadResource("27471003-7f27-42e3-a791-c159b33f5198", _mesh)) {
+    Resource *mesh = new MeshResource;
+    if (!ResourceManager::Instance().LoadResource("5f1e388c-39c4-471d-bfa2-727ab986dd1c", mesh)) {
         std::cerr << "EntityEnemy::Init(): Failed to load mesh" << std::endl;
+        delete mesh;
         return false;
     }
-    if (!ResourceManager::Instance().LoadResource("", _texture)) {
-        std::cerr << "EntityEnemy::Init(): Failed to load texture" << std::endl;
-        return false;
-    }
-
+    _mesh = (MeshResource *)mesh;
     _mesh->Init();
-    _texture->Init();
+
+    Resource *texture = new TextureResource;
+    if (!ResourceManager::Instance().LoadResource("", texture)) {
+        std::cerr << "EntityEnemy::Init(): Failed to load texture" << std::endl;
+        delete texture;
+    }
+    else {
+        _texture = (TextureResource *)texture;
+        _texture->Init();
+    }
 
     return true;
 }
