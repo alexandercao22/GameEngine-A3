@@ -1,10 +1,13 @@
 #include "Entity.h"
 
-void Entity::AddGUID(std::string guid)
+bool Entity::Init()
 {
-	if (guid.length() == 36) {
-		_GUIDs.push_back(guid);
-	}
+	return true;
+}
+
+bool Entity::Update()
+{
+	return true;
 }
 
 Transform *Entity::GetTransform()
@@ -12,7 +15,12 @@ Transform *Entity::GetTransform()
 	return &_transform;
 }
 
-std::vector<std::string> Entity::GetGUIDs()
+MeshResource *Entity::GetMesh()
 {
-	return _GUIDs;
+	return _mesh;
+}
+
+TextureResource *Entity::GetTexture()
+{
+	return _texture;
 }

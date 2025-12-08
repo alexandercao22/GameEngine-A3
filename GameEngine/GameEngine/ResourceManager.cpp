@@ -86,6 +86,9 @@ bool ResourceManager::Init() {
 }
 
 Resource *ResourceManager::Load(std::string guid) {
+	if (guid.length() != 36) {
+		return nullptr;
+	}
 	for (auto guids : _cachedResources) {
 		if (guids.first == guid) {
 			_cachedResources[guid]->RefAdd();
@@ -98,6 +101,8 @@ Resource *ResourceManager::Load(std::string guid) {
 			return LoadFromDisk(_GUIDtoPath[guid]);
 		}
 	}
+
+	return nullptr;
 	// Save GUID
 }
 

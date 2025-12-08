@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Resource.h"
+#include "MeshResource.h"
+#include "TextureResource.h"
+
 #include <string>
 #include <vector>
 #include "raylib.h"
@@ -13,15 +17,19 @@ private:
 		{ 1.0f, 1.0f, 1.0f }
 	};
 
-	std::vector<std::string> _GUIDs;
+protected:
+	MeshResource *_mesh = nullptr;
+	TextureResource *_texture = nullptr;
 
 public:
 	Entity() = default;
 	~Entity() = default;
 
-	void AddGUID(std::string guid);
+	virtual bool Init();
+	virtual bool Update();
 
 	Transform *GetTransform();
-	std::vector<std::string> GetGUIDs();
+	MeshResource *GetMesh();
+	TextureResource *GetTexture();
 };
 
