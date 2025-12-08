@@ -6,7 +6,16 @@
 #include <iomanip>
 #include <fstream>
 #include <iostream>
+#include <mutex>
 #include "Resource.h"
+#include "MeshResource.h"
+
+
+struct LoadState {
+	bool loading;
+	Resource* resource;
+	std::condition_variable cv;
+};
 
 class ResourceManager 
 {
@@ -16,9 +25,11 @@ private:
 	std::unordered_map<std::string, std::string> _PathtoGUID;
 	std::unordered_map<std::string, std::string> _GUIDtoType;
 	// List of cached Resources
-	std::unordered_map<std::string, Resource*> _cachedResources;
+	//std::unordered_map<std::string, Resource*> _cachedResources;
+	std::unordered_map<std::string, LoadState> _cachedResources;
 
-	Resource* LoadFromDisk(std::string path);
+	Resource* LoadFromDisk(std::string path, std::unique_lock<std::mutex> &lock);
+	std::mutex _mutex;
 
 public:
 	// Singleton instance

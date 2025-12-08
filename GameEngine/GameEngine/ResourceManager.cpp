@@ -2,6 +2,7 @@
 
 #include "MeshResource.h"
 #include "TextureResource.h"
+//#include <mutex>
 
 std::string GenerateGUID() {
 	static std::random_device rd;
@@ -37,7 +38,8 @@ std::string GenerateGUID() {
 	return ss.str();
 }
 
-Resource *ResourceManager::LoadFromDisk(std::string path) {
+Resource *ResourceManager::LoadFromDisk(std::string path, std::unique_lock<std::mutex> &lock) {
+	//lock.unlock();
 	std::string guid = _PathtoGUID[path];
 	std::string type = _GUIDtoType[guid];
 
@@ -49,14 +51,19 @@ Resource *ResourceManager::LoadFromDisk(std::string path) {
 		res = new TextureResource();
 	}
 	res->LoadFromDisk(path);
-	_cachedResources.insert({ guid, res });
+	//// Only one thread is allowed to write to CachedResources.
+	//std::lock_guard<std::mutex> lock(_mutex);
+	//LoadState state;
+	//state.resource = res;
+	//state.loading = false;
+	//_cachedResources.insert({ guid, res });
 
 	return res;
 }
 
 ResourceManager::~ResourceManager() {
-	for (auto res : _cachedResources) {
-		delete res.second;
+	for (auto& res : _cachedResources) {
+		delete res.second.resource;
 	}
 }
 
@@ -86,37 +93,78 @@ bool ResourceManager::Init() {
 }
 
 Resource *ResourceManager::Load(std::string guid) {
-	for (auto guids : _cachedResources) {
-		if (guids.first == guid) {
-			_cachedResources[guid]->RefAdd();
-			return _cachedResources[guid];
+	
+	/*{
+		for (auto guids : _cachedResources) {
+			if (guids.first == guid) {
+				std::lock_guard<std::mutex> lock(_mutex);
+				_cachedResources[guid]->RefAdd();
+				return _cachedResources[guid];
+			}
 		}
 	}
-	int exist = 0;
+	
 	for (auto guids : _GUIDtoPath) {
 		if (guids.first == guid) {
+			{
+				std::lock_guard<std::mutex> lock(_mutex);
+				LoadState state;
+				state.loading = true;
+			}
 			return LoadFromDisk(_GUIDtoPath[guid]);
 		}
-	}
+	}*/
 	// Save GUID
+
+
+	std::unique_lock<std::mutex> lock(_mutex);
+
+	auto& state = _cachedResources[guid];
+
+	if (state.resource) {
+		state.resource->RefAdd();
+		return state.resource;
+	}
+
+	if (state.loading) {
+		state.cv.wait(lock, [&] {return state.resource != nullptr; });
+		state.resource->RefAdd();
+		return state.resource;
+	}
+	
+	state.loading = true;
+	lock.unlock();
+
+	Resource* res = LoadFromDisk(_GUIDtoPath[guid], lock);
+
+	lock.lock();
+	state.resource = res;
+	state.loading = false;
+	res->RefAdd();
+	state.cv.notify_all();
+	return res;
 }
 
 bool ResourceManager::Unload(std::string guid) {
-	Resource* res = _cachedResources[guid];
-	if (res == nullptr) {
+	std::lock_guard<std::mutex> lock(_mutex);
+	auto& res = _cachedResources[guid];
+	if (res.resource == nullptr) {
 		return false;
 	}
-	int ref = res->GetRef();
+	int ref = res.resource->GetRef();
 	if (ref == 1) {
-		_cachedResources[guid]->UnLoad();
+		//_cachedResources[guid]->UnLoad();
+		res.resource->UnLoad();
 		_cachedResources.erase(guid);
 		return true;
 	}
 	else if (ref > 1) {
-		_cachedResources[guid]->RefSub();
+		//_cachedResources[guid]->RefSub();
+		res.resource->RefSub();
 		return true;
 	}
 	else {
+		std::cerr << "ResourceManager::Unload(): Asset already unloaded " << std::endl;
 		return false;
 	}
 }
