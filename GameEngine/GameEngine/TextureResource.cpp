@@ -9,7 +9,9 @@ bool TextureResource::Init()
 
 	if (!IsTextureValid(_texture)) {
 		std::cerr << "TextureResource::Init(): Failed to load texture" << std::endl;
+		return false;
 	}
+
 	return true;
 }
 
