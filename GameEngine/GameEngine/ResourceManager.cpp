@@ -23,7 +23,7 @@ ResourceManager::~ResourceManager() {
 	}
 }
 
-bool ResourceManager::LoadResource(std::string guid, Resource*& resource) {
+bool ResourceManager::LoadResource(std::string guid, Resource* resource) {
 	auto pair = _cachedResources.find(guid);
 	if (pair != _cachedResources.end()) {
 		// Resource already exists in cache

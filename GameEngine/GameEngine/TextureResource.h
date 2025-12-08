@@ -10,6 +10,7 @@ private:
 	Texture2D _texture;
 
 public:
+	bool Init();
 	TextureResource *LoadFromDisk(std::string path) override;
 	void UnLoad() override;
 	Texture2D GetTexture();

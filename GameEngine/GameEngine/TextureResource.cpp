@@ -2,6 +2,17 @@
 
 #include <iostream>
 
+bool TextureResource::Init()
+{
+	Image image = LoadImageFromMemory("png", (const unsigned char*)_data.data.get(), _data.size);
+	_texture = LoadTextureFromImage(image);
+
+	if (!IsTextureValid(_texture)) {
+		std::cerr << "TextureResource::Init(): Failed to load texture" << std::endl;
+	}
+	return true;
+}
+
 TextureResource *TextureResource::LoadFromDisk(std::string path)
 {
 	Resource::RefAdd();

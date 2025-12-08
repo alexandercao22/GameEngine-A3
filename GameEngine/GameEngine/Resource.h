@@ -5,8 +5,10 @@
 
 class Resource {
 private:
-	AssetData _data;
 	int _refCount = 0;
+
+protected:
+	AssetData _data;
 
 public:
 	virtual Resource* LoadFromDisk(std::string id) = 0;
