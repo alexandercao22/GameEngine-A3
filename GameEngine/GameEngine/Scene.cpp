@@ -42,6 +42,13 @@ bool Scene::RenderInterface()
 	return true;
 }
 
+Scene::~Scene()
+{
+	for (Entity *ent : _entities) {
+		delete ent;
+	}
+}
+
 bool Scene::Init(unsigned int width, unsigned int height)
 {
 	_width = width;
@@ -58,27 +65,21 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	_camera.fovy = 90.0f;
 	_camera.projection = CAMERA_PERSPECTIVE;
 
-	Entity ent;
-	ent.AddGUID("69f74b0d-b87d-44b0-bb89-4fb94b5243c8"); // mushroom.obj
-	ent.GetTransform()->translation.x = 0.0f;
-	_entities.push_back(ent);
-	ent.GetTransform()->translation.x = 2.0f;
-	_entities.push_back(ent);
-	ent.GetTransform()->translation.x = 4.0f;
+	EntityEnemy *ent = new EntityEnemy;
+	ent->Init();
+	ent->GetTransform()->translation.x = 4.0f;
 	_entities.push_back(ent);
 
-	ent = Entity();
-	ent.AddGUID("90c94e91-dd63-441f-9372-b12a77b8036a"); // cubeWithTexture.obj
-	ent.AddGUID("2fe16579-8532-47b5-a6d4-a36f22611c3c"); // cubemaps_skybox.png
-	ent.GetTransform()->translation.y = 4.0f;
+	ent = new EntityEnemy;
+	ent->Init();
+	ent->GetTransform()->translation.y = 4.0f;
 	_entities.push_back(ent);
 
-	ent = Entity();
-	//ent.AddGUID(ResourceManager::Instance().SaveGUID("Resources/Duck.gltf"));
-	ent.AddGUID("27471003-7f27-42e3-a791-c159b33f5198");
-	ent.GetTransform()->translation.x = 4.0f;
-	ent.GetTransform()->translation.y = 4.0f;
-	ent.GetTransform()->translation.z = 4.0f;
+	ent = new EntityEnemy;
+	ent->Init();
+	ent->GetTransform()->translation.x = 4.0f;
+	ent->GetTransform()->translation.y = 4.0f;
+	ent->GetTransform()->translation.z = 4.0f;
 	_entities.push_back(ent);
 
 	return true;
@@ -114,27 +115,20 @@ bool Scene::RenderUpdate()
 		UpdateCamera(&_camera, CAMERA_FREE);
 	}
 
-	for (Entity ent : _entities) {
-		Transform *transform = ent.GetTransform();
-		MeshResource *mesh = nullptr;
-		TextureResource *texture = nullptr;
-		for (std::string guid : ent.GetGUIDs()) {
-			if (ResourceManager::Instance().GetGUIDType(guid) == "Mesh") {
-				mesh = (MeshResource *)ResourceManager::Instance().Load(guid);
+	for (Entity *ent : _entities) {
+		Transform *transform = ent->GetTransform();
+		MeshResource *mesh = ent->GetMesh();
+		TextureResource *texture = ent->GetTexture();
+		if (mesh != nullptr) {
+			if (texture != nullptr) {
+				SetMaterialTexture(&mesh->GetModel().materials[0], MATERIAL_MAP_DIFFUSE, texture->GetTexture());
+				Vector3 rotation = { transform->rotation.x, transform->rotation.y, transform->rotation.z };
+				DrawModelEx(mesh->GetModel(), transform->translation, rotation, transform->rotation.w, transform->scale, WHITE);
 			}
-			else if (ResourceManager::Instance().GetGUIDType(guid) == "Texture") {
-				texture = (TextureResource *)ResourceManager::Instance().Load(guid);
+			else {
+				Vector3 rotation = { transform->rotation.x, transform->rotation.y, transform->rotation.z };
+				DrawModelEx(mesh->GetModel(), transform->translation, rotation, transform->rotation.w, transform->scale, RED);
 			}
-		}
-
-		if (texture != nullptr) {
-			SetMaterialTexture(&mesh->GetModel().materials[0], MATERIAL_MAP_DIFFUSE, texture->GetTexture());
-			Vector3 rotation = { transform->rotation.x, transform->rotation.y, transform->rotation.z };
-			DrawModelEx(mesh->GetModel(), transform->translation, rotation, transform->rotation.w, transform->scale, WHITE);
-		}
-		else {
-			Vector3 rotation = { transform->rotation.x, transform->rotation.y, transform->rotation.z };
-			DrawModelEx(mesh->GetModel(), transform->translation, rotation, transform->rotation.w, transform->scale, RED);
 		}
 	}
 
