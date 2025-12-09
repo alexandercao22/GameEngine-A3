@@ -429,6 +429,25 @@ bool PackageManager::UnmountPackage(const std::string& packageKey)
 	return true;
 }
 
+bool PackageManager::UnmountAllPackages()
+{
+	std::unique_lock<std::shared_mutex> lock(_mountMutex);
+
+	if (_mountOrder.empty()) {
+		std::cerr << "PackageManger::UnmountAllPackages(): No packages are currently mounted" << std::endl;
+		return false;
+	}
+
+	_mountedPackages.clear();
+	_mountOrder.clear();
+
+	if (DEBUG) {
+		std::cout << "Unmounted all packages" << std::endl;
+	}
+
+	return true;
+}
+
 bool PackageManager::LoadAssetByGuid(const std::string& guid, AssetData& asset)
 {
 	// Locks write operations to mount containers (thread safety)

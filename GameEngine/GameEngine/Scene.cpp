@@ -48,7 +48,7 @@ Scene::~Scene()
 		delete ent;
 	}
 
-	ResourceManager::Instance().GetPackageManager()->UnmountPackage("Resources/Mesh.gepak");
+	ResourceManager::Instance().GetPackageManager()->UnmountAllPackages();
 }
 
 bool Scene::Init(unsigned int width, unsigned int height)

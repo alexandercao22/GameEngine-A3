@@ -68,6 +68,8 @@ public:
 	bool UnmountPackage();
 	// Unmount the package specifed by packageKey
 	bool UnmountPackage(const std::string& packageKey);
+	// Unmounts all currently mounted packages
+	bool UnmountAllPackages();
 
 	// Loads asset specified by GUID
 	bool LoadAssetByGuid(const std::string& guid, AssetData& asset);
