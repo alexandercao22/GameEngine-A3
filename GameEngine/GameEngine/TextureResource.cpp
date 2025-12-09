@@ -2,17 +2,28 @@
 
 #include <iostream>
 
-bool TextureResource::Init()
+bool TextureResource::LoadFromData(const char* data, size_t size)
 {
-	Image image = LoadImageFromMemory("png", (const unsigned char*)_data.data.get(), _data.size);
+	Image image = LoadImageFromMemory("png", (const unsigned char*)data, size);
 	_texture = LoadTextureFromImage(image);
 
 	if (!IsTextureValid(_texture)) {
-		std::cerr << "TextureResource::Init(): Failed to load texture" << std::endl;
+		std::cerr << "TextureResource::LoadFromData(): Failed to load texture" << std::endl;
 		return false;
 	}
 
+	// Calculate memory usage
+	size_t textureSize = image.width * image.height * 4;
+	_memoryUsage = (uint64_t)textureSize;
+
+	UnloadImage(image);
+
 	return true;
+}
+
+uint64_t TextureResource::GetMemoryUsage()
+{
+	return _memoryUsage;
 }
 
 TextureResource *TextureResource::LoadFromDisk(std::string path)

@@ -11,7 +11,3 @@ void Resource::RefSub() {
 int Resource::GetRef() {
 	return _refCount;
 }
-
-void Resource::SetData(AssetData& data) {
-	_data = std::move(data);
-}

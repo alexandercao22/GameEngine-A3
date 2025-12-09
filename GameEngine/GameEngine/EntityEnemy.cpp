@@ -25,7 +25,6 @@ bool EntityEnemy::Init()
         return false;
     }
     _mesh = (MeshResource *)mesh;
-    _mesh->Init();
 
     Resource *texture = new TextureResource;
     if (!ResourceManager::Instance().LoadResource("", texture)) {
@@ -34,7 +33,6 @@ bool EntityEnemy::Init()
     }
     else {
         _texture = (TextureResource *)texture;
-        _texture->Init();
     }
 
     return true;
