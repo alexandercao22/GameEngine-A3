@@ -60,7 +60,11 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	SetTargetFPS(60);
 	rlImGuiSetup(true);
 
-	ResourceManager::Instance().GetPackageManager()->MountPackage("Resources/Mesh.gepak");
+	std::string packagePath = "Resources/Mesh.gepak";
+	if (!ResourceManager::Instance().GetPackageManager()->MountPackage(packagePath)) {
+		std::cerr << "Scene::Init(): Could not load package: " << packagePath << std::endl;
+		return false;
+	}
 
 	// Initialize camera
 	_camera.position = { 0.0f, 5.0f, 10.0f };
