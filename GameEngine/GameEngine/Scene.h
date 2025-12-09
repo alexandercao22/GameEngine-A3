@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include "raylib.h"
+#include "ScenePart.h"
 
 class Scene
 {
@@ -13,6 +14,9 @@ private:
 	std::vector<std::string> _GUIDs; // GUIDs needed for this specific scene
 
 	std::vector<Entity *> _entities;
+	
+	// The parts hold a package to a "lvl" and a distance. When distance is appropiate run async loading
+	std::vector<ScenePart> _parts;
 
 	Camera3D _camera = { 0 };
 	bool _showCursor = true;

@@ -503,3 +503,42 @@ bool PackageManager::LoadAssetByPath(const std::string& path, AssetData& asset)
 	std::cerr << "PackageManager::LoadAssetByPath(): Asset does not exist within a mounted package" << std::endl;
 	return false;
 }
+
+//MountedPackage PackageManager::GetMountedPackage() {
+//	std::string key = _mountOrder.back();
+//	return _mountedPackages[key];
+//}
+
+std::vector<std::string> PackageManager::GetGUIDsInPackage(const std::string& packageKey)
+{
+	std::vector<std::string> guids;
+
+	// Läs-lås (vi muterar inget)
+	std::shared_lock<std::shared_mutex> lock(_mountMutex);
+
+	auto packageIt = _mountedPackages.find(packageKey);
+	if (packageIt == _mountedPackages.end()) {
+		std::cerr << "PackageManager::GetGUIDsInPackage(): Package not mounted: "
+			<< packageKey << std::endl;
+		return guids;
+	}
+
+	const MountedPackage& package = packageIt->second;
+
+	guids.reserve(package.tocByGuid.size());
+	for (const auto& [guid, entry] : package.tocByGuid) {
+		guids.push_back(guid);
+	}
+
+	return guids;
+}
+
+std::vector<std::string> PackageManager::GetGUIDsInLastMountedPackage()
+{
+	std::shared_lock<std::shared_mutex> lock(_mountMutex);
+
+	if (_mountOrder.empty())
+		return {};
+
+	return GetGUIDsInPackage(_mountOrder.back());
+}

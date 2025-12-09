@@ -91,3 +91,42 @@ uint64_t ResourceManager::GetMemoryUsed()
 {
 	return _memoryUsed;
 }
+
+void ResourceManager::WorkerThread() {
+	// This thread will run in
+	while (true) {
+		if (!_newPackage.empty()) {
+
+			if (!_packageManager.MountPackage(_newPackage.at(0))) {
+				std::cerr << "ResourceManager::MountPackage(): Could not mount package" << std::endl;
+			}
+			//MountedPackage pack = _packageManager.GetMountedPackage();
+			
+			std::vector<std::string> guids = _packageManager.GetGUIDsInLastMountedPackage();
+
+			//std::string guid = pack.tocByGuid[];
+			for (const std::string& guid : guids) {
+
+				AssetData data;
+				if (!_packageManager.LoadAssetByGuid(guid, data)) {
+					std::cerr << "ResourceManager::LoadResource(): Could not load resource" << std::endl;
+
+				}
+				_threadData.emplace(guid, std::move(data));
+				
+			}
+
+			_newPackage.at(0).erase();
+		}
+	}
+}
+
+int ResourceManager::GetThreadDataSize() {
+	return _threadData.size();
+}
+
+bool ResourceManager::LoadObject(Resource* &resource) {
+	
+	//resource->LoadFromData(_threadData.at(0).data, _threadData.at(0).size);
+	
+}
