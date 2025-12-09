@@ -8,7 +8,9 @@ private:
 	Model _model;
 
 public:
-	bool Init();
+	bool LoadFromData(const char* data, size_t size);
+	uint64_t GetMemoryUsage();
+
 	MeshResource* LoadFromDisk(std::string GUID) override;
 	void UnLoad() override;
 	Model GetModel();

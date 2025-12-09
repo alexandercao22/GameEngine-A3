@@ -18,14 +18,18 @@ bool ResourceManager::LoadResource(std::string guid, Resource *&resource) {
 		// Resource does not exist in cache -> load it from mounted package
 		AssetData data;
 		if (!_packageManager.LoadAssetByGuid(guid, data)) {
-			std::cerr << "ResourceManager::LoadResource(): Could not load resource" << std::endl;
+			std::cerr << "ResourceManager::LoadResource(): Could not load resource data from package" << std::endl;
 			return false;
 		}
-		resource->SetData(data);
+
+		if (!resource->LoadFromData(data.data.get(), data.size)) {
+			std::cerr << "ResourceManager::LoadResource(): Could not load resource from raw data" << std::endl;
+			return false;
+		}
 
 		resource->RefAdd();
 		_cachedResources.emplace(guid, resource);
-		_memoryUsed += sizeof(_cachedResources[guid]);
+		_memoryUsed += resource->GetMemoryUsage();
 
 		// Memory limit warning
 		if (_limitMemory && (_memoryUsed >= _memoryLimit)) {
@@ -45,7 +49,7 @@ bool ResourceManager::UnloadResource(std::string guid) {
 	int ref = res->GetRef();
 	if (ref == 1) {
 		// References goes to 0 -> remove resource from cache
-		_memoryUsed -= sizeof(_cachedResources[guid]);
+		_memoryUsed -= _cachedResources[guid]->GetMemoryUsage();
 		_cachedResources[guid]->UnLoad();
 		_cachedResources.erase(guid);
 		return true;
