@@ -57,7 +57,7 @@ bool ResourceManager::UnloadResource(std::string guid) {
 	if (ref == 1) {
 		// References goes to 0 -> remove resource from cache
 		_memoryUsed -= _cachedResources[guid]->GetMemoryUsage();
-		_cachedResources[guid]->UnLoad();
+		_cachedResources[guid]->Unload();
 		_cachedResources.erase(guid);
 		return true;
 	}
