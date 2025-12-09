@@ -13,6 +13,11 @@ EntityEnemy::~EntityEnemy()
 
 bool EntityEnemy::Init()
 {
+    if (_mesh || _texture) {
+        std::cerr << "EntityEnemey::Init(): Enemy is already initialized" << std::endl;
+        return false;
+    }
+
     Resource *mesh = new MeshResource;
     if (!ResourceManager::Instance().LoadResource("5f1e388c-39c4-471d-bfa2-727ab986dd1c", mesh)) {
         std::cerr << "EntityEnemy::Init(): Failed to load mesh" << std::endl;
