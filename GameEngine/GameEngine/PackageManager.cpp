@@ -390,7 +390,7 @@ bool PackageManager::UnmountPackage()
 
 	auto packagePair = _mountedPackages.find(packageKey);
 	if (packagePair == _mountedPackages.end()) {
-		std::cerr << "PackageManager::LoadAsset(): No package with matching key has been mounted" << std::endl;
+		std::cerr << "PackageManager::UnmountPackage(): No package with matching key has been mounted" << std::endl;
 		return false;
 	}
 	_mountedPackages.erase(packagePair);
@@ -413,7 +413,7 @@ bool PackageManager::UnmountPackage(const std::string& packageKey)
 	// Removing the mounted package
 	auto packagePair = _mountedPackages.find(packageKey);
 	if (packagePair == _mountedPackages.end()) {
-		std::cerr << "PackageManager::LoadAsset(): No package with matching key has been mounted" << std::endl;
+		std::cerr << "PackageManager::UnmountPackage(): No package with matching key has been mounted" << std::endl;
 		return false;
 	}
 	_mountedPackages.erase(packagePair);
