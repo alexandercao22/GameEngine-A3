@@ -1,5 +1,7 @@
 #include "ResourceManager.h"
 
+#include "GuidUtils.h"
+
 ResourceManager::~ResourceManager() {
 	for (auto pair : _cachedResources) {
 		delete pair.second;
@@ -7,6 +9,11 @@ ResourceManager::~ResourceManager() {
 }
 
 bool ResourceManager::LoadResource(std::string guid, Resource *&resource) {
+	if (guid.length() != GUID_STR_LENGTH) {
+		std::cerr << "ResourceManager::LoadResource(): GUID is invalid" << std::endl;
+		return false;
+	}
+
 	auto pair = _cachedResources.find(guid);
 	if (pair != _cachedResources.end()) {
 		// Resource already exists in cache
