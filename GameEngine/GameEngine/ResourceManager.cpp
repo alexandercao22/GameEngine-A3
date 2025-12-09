@@ -1,22 +1,5 @@
 #include "ResourceManager.h"
 
-//Resource *ResourceManager::LoadFromDisk(std::string path) {
-//	std::string guid = _PathtoGUID[path];
-//	std::string type = _GUIDtoType[guid];
-//
-//	Resource *res = nullptr;
-//	if (type == "Mesh") {
-//		res = new MeshResource();
-//	}
-//	else if (type == "Texture") {
-//		res = new TextureResource();
-//	}
-//	res->LoadFromDisk(path);
-//	_cachedResources.insert({ guid, res });
-//
-//	return res;
-//}
-
 ResourceManager::~ResourceManager() {
 	for (auto pair : _cachedResources) {
 		delete pair.second;
@@ -42,6 +25,13 @@ bool ResourceManager::LoadResource(std::string guid, Resource *&resource) {
 
 		resource->RefAdd();
 		_cachedResources.emplace(guid, resource);
+		_memoryUsed += sizeof(_cachedResources[guid]);
+
+		// Memory limit warning
+		if (_limitMemory && (_memoryUsed >= _memoryLimit)) {
+			std::cerr << "Warning: ResourceManager memory limit reached: " << _memoryUsed << " of " << _memoryLimit << " bytes used" << std::endl;
+		}
+
 		return true;
 	}
 }
@@ -54,11 +44,14 @@ bool ResourceManager::UnloadResource(std::string guid) {
 	}
 	int ref = res->GetRef();
 	if (ref == 1) {
+		// References goes to 0 -> remove resource from cache
+		_memoryUsed -= sizeof(_cachedResources[guid]);
 		_cachedResources[guid]->UnLoad();
 		_cachedResources.erase(guid);
 		return true;
 	}
 	else if (ref > 1) {
+		// References does not go to zero -> subtract from reference count
 		_cachedResources[guid]->RefSub();
 		return true;
 	}
@@ -73,41 +66,28 @@ PackageManager *ResourceManager::GetPackageManager()
 	return &_packageManager;
 }
 
-//std::string ResourceManager::GetGUIDType(std::string guid)
-//{
-//	return _GUIDtoType[guid];
-//}
-//
-//std::string ResourceManager::SaveGUID(std::string path) {
-//	// Checking if asset already exists in folder to prohibit duplication
-//	for (auto paths : _PathtoGUID) {
-//		if (paths.first == path) {
-//			std::cerr << "ResourceManager::SaveGUID(): Asset already exists in Resources" << std::endl;
-//			return "";
-//		}
-//	}
-//
-//	std::string guid = GenerateGUID();
-//
-//	_PathtoGUID.insert({ path, guid });
-//	_GUIDtoPath.insert({ guid, path });
-//
-//	std::ofstream file("Resources/Assets.txt", std::ios::app);
-//	if (!file.is_open()) {
-//		std::cerr << "ResourceManager::SaveGUID(): Failed to open Assets.txt for appending" << std::endl;
-//		return "";
-//	}
-//
-//	std::string type = "";
-//	if (path.find(".obj") != std::string::npos ||
-//		path.find(".gltf") != std::string::npos) {
-//		type = "Mesh";
-//	}
-//	else if (path.find(".png") != std::string::npos ||
-//		path.find(".jpg") != std::string::npos) {
-//		type = "Texture";
-//	}
-//
-//	file << guid << ":" << type << ":" << path << "\n";
-//	return guid;
-//}
+void ResourceManager::EnableMemoryLimit(uint64_t limit)
+{
+	_limitMemory = true;
+	_memoryLimit = limit;
+}
+
+void ResourceManager::DisableMemoryLimit()
+{
+	_limitMemory = false;
+}
+
+uint64_t ResourceManager::GetMemoryLimit()
+{
+	return _memoryLimit;
+}
+
+void ResourceManager::SetMemoryLimit(uint64_t limit)
+{
+	_memoryLimit = limit
+}
+
+uint64_t ResourceManager::GetMemoryUsed()
+{
+	return _memoryUsed;
+}

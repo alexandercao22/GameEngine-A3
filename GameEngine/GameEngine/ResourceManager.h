@@ -12,11 +12,9 @@
 class ResourceManager 
 {
 private:
-	//// List of GUIDS
-	//std::unordered_map<std::string, std::string> _GUIDtoPath;
-	//std::unordered_map<std::string, std::string> _PathtoGUID;
-	//std::unordered_map<std::string, std::string> _GUIDtoType;
-	//Resource* LoadFromDisk(std::string path);
+	bool _limitMemory = false;
+	uint64_t _memoryLimit;
+	uint64_t _memoryUsed;
 	
 	PackageManager _packageManager; // Manages packages and resource loading from packages
 	std::unordered_map<std::string, Resource*> _cachedResources; // Currently used resources with reference counts
@@ -39,6 +37,15 @@ public:
 
 	PackageManager *GetPackageManager();
 
-	//std::string GetGUIDType(std::string guid);
-	//std::string SaveGUID(std::string path);
+	// Enables and sets memory limit (in bytes)
+	void EnableMemoryLimit(uint64_t memoryLimit);
+	// Disables memory limit
+	void DisableMemoryLimit();
+	// Gets memory limit (in bytes)
+	uint64_t GetMemoryLimit();
+	// Sets memory limit (in bytes)
+	void SetMemoryLimit(uint64_t limit);
+
+	// Gets memory used (in bytes)
+	uint64_t GetMemoryUsed();
 };
