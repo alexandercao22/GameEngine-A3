@@ -84,12 +84,15 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	_camera.projection = CAMERA_PERSPECTIVE;
 
 	const int numEnemies = 10000;
+	const int row = 100; // Num entities on a row
+	const int col = 100; // Num entities on a column
 	auto t0 = std::chrono::high_resolution_clock::now();
 	for (int i = 0; i < numEnemies; i++) {
 		EntityEnemy *ent = new EntityEnemy;
 		ent->Init();
-		ent->GetTransform()->translation.x = (int)(i / 10.0f) * 5;
-		ent->GetTransform()->translation.z = -(i % 10) * 5;
+		Transform *t = ent->GetTransform();
+		t->translation.x = (int)(i / row) * -5;
+		t->translation.z = -(i % col) * 5;
 		_entities.push_back(ent);
 	}
 	auto t1 = std::chrono::high_resolution_clock::now();
@@ -114,9 +117,9 @@ bool Scene::RenderUpdate()
 	rlImGuiBegin();
 	BeginMode3D(_camera);
 
-	if (!RenderInterface()) {
-		return false;
-	}
+	//if (!RenderInterface()) {
+	//	return false;
+	//}
 
 	if (IsKeyPressed(KEY_C)) {
 		_showCursor = !_showCursor;
