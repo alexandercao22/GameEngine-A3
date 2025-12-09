@@ -1,26 +1,24 @@
 #pragma once
 
 #include <string>
-#include "PackageManager.h"
 
 class Resource {
 private:
 	int _refCount = 0;
 
 protected:
-	AssetData _data;
+	uint64_t _memoryUsage = 0;
 
 public:
 	virtual ~Resource() = default;
 
+	virtual bool LoadFromData(const char* data, size_t size) = 0;
+	virtual uint64_t GetMemoryUsage() = 0;
+
 	virtual Resource* LoadFromDisk(std::string id) = 0;
 	virtual void UnLoad() = 0;
-	//virtual GetProperties();
 	
 	virtual void RefAdd();
 	virtual void RefSub();
 	virtual int GetRef();
-
-	void SetData(AssetData& assetData);
-
 };
