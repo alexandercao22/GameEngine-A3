@@ -2,11 +2,13 @@
 
 #include "ResourceManager.h"
 #include "Resource.h"
+#include "MeshResource.h"
+#include "TextureResource.h"
 
 EntityEnemy::~EntityEnemy()
 {
     ResourceManager::Instance().UnloadResource("5f1e388c-39c4-471d-bfa2-727ab986dd1c");
-    ResourceManager::Instance().UnloadResource("");
+    ResourceManager::Instance().UnloadResource("4fee39f8-43fc-46ba-9263-2081981e4637");
     delete _mesh;
     delete _texture;
 }
@@ -27,7 +29,7 @@ bool EntityEnemy::Init()
     _mesh = (MeshResource *)mesh;
 
     Resource *texture = new TextureResource;
-    if (!ResourceManager::Instance().LoadResource("", texture)) {
+    if (!ResourceManager::Instance().LoadResource("4fee39f8-43fc-46ba-9263-2081981e4637", texture)) {
         std::cerr << "EntityEnemy::Init(): Failed to load texture" << std::endl;
         delete texture;
     }
