@@ -10,10 +10,11 @@ private:
 	Texture2D _texture;
 
 public:
-	bool Init();
+	bool LoadFromData(const char* data, size_t size);
+	uint64_t GetMemoryUsage();
+
 	TextureResource *LoadFromDisk(std::string path) override;
 	void UnLoad() override;
 	Texture2D GetTexture();
-
 };
 
