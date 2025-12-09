@@ -84,7 +84,7 @@ uint64_t ResourceManager::GetMemoryLimit()
 
 void ResourceManager::SetMemoryLimit(uint64_t limit)
 {
-	_memoryLimit = limit
+	_memoryLimit = limit;
 }
 
 uint64_t ResourceManager::GetMemoryUsed()
