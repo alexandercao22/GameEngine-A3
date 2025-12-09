@@ -4,7 +4,12 @@
 
 bool TextureResource::LoadFromData(const char* data, size_t size)
 {
-	Image image = LoadImageFromMemory("png", (const unsigned char*)data, size);
+	Image image = LoadImageFromMemory(".png", (const unsigned char*)data, size);
+	if (!IsImageValid(image)) {
+		std::cerr << "TextureResource::LoadFromData(): Failed to load image" << std::endl;
+		return false;
+	}
+
 	_texture = LoadTextureFromImage(image);
 
 	if (!IsTextureValid(_texture)) {
