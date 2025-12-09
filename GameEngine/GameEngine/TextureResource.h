@@ -14,7 +14,7 @@ public:
 	uint64_t GetMemoryUsage();
 
 	TextureResource *LoadFromDisk(std::string path) override;
-	void UnLoad() override;
+	void Unload() override;
 	Texture2D GetTexture();
 };
 

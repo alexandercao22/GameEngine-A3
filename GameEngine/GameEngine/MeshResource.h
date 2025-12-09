@@ -12,6 +12,6 @@ public:
 	uint64_t GetMemoryUsage();
 
 	MeshResource* LoadFromDisk(std::string GUID) override;
-	void UnLoad() override;
+	void Unload() override;
 	Model GetModel();
 };
