@@ -62,9 +62,17 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	SetTargetFPS(60);
 	rlImGuiSetup(true);
 
-	std::string packagePath = "Resources/Mesh.gepak";
-	if (!ResourceManager::Instance().GetPackageManager()->MountPackage(packagePath)) {
-		std::cerr << "Scene::Init(): Could not load package: " << packagePath << std::endl;
+	std::string meshesPkg = "Resources/Meshes.gepak";
+	ResourceManager::Instance().GetPackageManager()->Pack("Resources/Meshes", "Resources");
+	if (!ResourceManager::Instance().GetPackageManager()->MountPackage(meshesPkg)) {
+		std::cerr << "Scene::Init(): Could not load package: " << meshesPkg << std::endl;
+		return false;
+	}
+
+	std::string texturesPkg = "Resources/Textures.gepak";
+	ResourceManager::Instance().GetPackageManager()->Pack("Resources/Textures", "Resources");
+	if (!ResourceManager::Instance().GetPackageManager()->MountPackage(texturesPkg)) {
+		std::cerr << "Scene::Init(): Could not load package: " << texturesPkg << std::endl;
 		return false;
 	}
 
