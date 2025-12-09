@@ -1,9 +1,11 @@
 #include "Scene.h"
+#include "Settings.h"
 
 #include "imgui.h"
 #include "rlImGui.h"
 
 #include "WinFileDialog.h"
+#include <chrono>
 
 #include "ResourceManager.h"
 #include "MeshResource.h"
@@ -73,22 +75,36 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	_camera.fovy = 90.0f;
 	_camera.projection = CAMERA_PERSPECTIVE;
 
-	EntityEnemy *ent = new EntityEnemy;
-	ent->Init();
-	ent->GetTransform()->translation.x = 4.0f;
-	_entities.push_back(ent);
+	//EntityEnemy *ent = new EntityEnemy;
+	//ent->Init();
+	//ent->GetTransform()->translation.x = 4.0f;
+	//_entities.push_back(ent);
 
-	ent = new EntityEnemy;
-	ent->Init();
-	ent->GetTransform()->translation.y = 4.0f;
-	_entities.push_back(ent);
+	//ent = new EntityEnemy;
+	//ent->Init();
+	//ent->GetTransform()->translation.y = 4.0f;
+	//_entities.push_back(ent);
 
-	ent = new EntityEnemy;
-	ent->Init();
-	ent->GetTransform()->translation.x = 4.0f;
-	ent->GetTransform()->translation.y = 4.0f;
-	ent->GetTransform()->translation.z = 4.0f;
-	_entities.push_back(ent);
+	//ent = new EntityEnemy;
+	//ent->Init();
+	//ent->GetTransform()->translation.x = 4.0f;
+	//ent->GetTransform()->translation.y = 4.0f;
+	//ent->GetTransform()->translation.z = 4.0f;
+	//_entities.push_back(ent);
+
+	auto t0 = std::chrono::high_resolution_clock::now();
+	const int numEnemies = 10;
+	for (int i = 0; i < numEnemies; i++) {
+		EntityEnemy *ent = new EntityEnemy;
+		ent->Init();
+		_entities.push_back(ent);
+	}
+	auto t1 = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> duration = t1 - t0;
+
+#ifdef DEBUG
+	std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
+#endif
 
 	return true;
 }
