@@ -8,18 +8,19 @@ namespace fs = std::filesystem;
 bool PackageManager::LoadAsset(MountedPackage& mountedPackage, const PackageEntry& packageEntry, AssetData& asset)
 {
 	// Read compressed data into a buffer
+	std::ifstream file(mountedPackage.path, std::ios::binary);
+	if (!file) {
+		std::cerr << "PackageManager::LoadAsset(): Could not open package file" << std::endl;
+		return false;
+	}
+
 	AssetData compressedData;
 	compressedData.size = packageEntry.sizeCompressed;
 	compressedData.data = std::make_unique<char[]>(packageEntry.sizeCompressed);
 
-	{
-		// Locks read/write during ifstream manipulation and reading (thread safety)
-		std::lock_guard<std::mutex> seekLock(*mountedPackage.seekMutex);
-
-		mountedPackage.openFile.clear(); // Resets read if EOF has been hit
-		mountedPackage.openFile.seekg(packageEntry.offset);
-		mountedPackage.openFile.read(compressedData.data.get(), compressedData.size);
-	}
+	file.clear(); // Resets read if EOF has been hit
+	file.seekg(packageEntry.offset);
+	file.read(compressedData.data.get(), compressedData.size);
 
 	// Decompress data from buffer
 	AssetData uncompressedData;
@@ -329,7 +330,7 @@ bool PackageManager::MountPackage(const std::string& source)
 	}
 
 	MountedPackage mountedPackage;
-	mountedPackage.seekMutex = std::make_unique<std::mutex>();
+	mountedPackage.path = source;
 
 	// Loop through toc and collect all entries
 	in.seekg(header.tableOfContentsOffset);
@@ -359,7 +360,6 @@ bool PackageManager::MountPackage(const std::string& source)
 
 	std::string packageKey = sourcePath.stem().generic_string();
 
-	mountedPackage.openFile = std::move(in);
 	{
 		// Locking read/write during vector and unoredered map manipulation (thread safety)
 		std::unique_lock<std::shared_mutex> lock(_mountMutex);

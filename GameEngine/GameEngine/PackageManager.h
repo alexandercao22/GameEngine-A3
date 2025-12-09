@@ -32,8 +32,7 @@ struct TOCEntry {
 
 // Supports lookup by GUID and by path
 struct MountedPackage {
-	std::unique_ptr<std::mutex> seekMutex; // Used to prevent multiple packages seeking the file at once (pointer to ensure struct is moveable)
-	std::ifstream openFile; // Package file (open while mounted)
+	std::string path; // Path to the mounted package
 	std::unordered_map<std::string, PackageEntry> tocByPath; // Key (string): name of the file inside the package (file.extension)
 	std::unordered_map<std::string, PackageEntry> tocByGuid; // Key (string): GUID of the asset found in its .meta file (file.extension.meta)
 };
