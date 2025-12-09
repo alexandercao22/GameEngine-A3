@@ -12,9 +12,14 @@ bool PackageManager::LoadAsset(MountedPackage& mountedPackage, const PackageEntr
 	compressedData.size = packageEntry.sizeCompressed;
 	compressedData.data = std::make_unique<char[]>(packageEntry.sizeCompressed);
 
-	mountedPackage.openFile.clear(); // Resets read if EOF has been hit
-	mountedPackage.openFile.seekg(packageEntry.offset);
-	mountedPackage.openFile.read(compressedData.data.get(), compressedData.size);
+	{
+		// Locks read/write during ifstream manipulation and reading (thread safety)
+		std::lock_guard<std::mutex> seekLock(*mountedPackage.seekMutex);
+
+		mountedPackage.openFile.clear(); // Resets read if EOF has been hit
+		mountedPackage.openFile.seekg(packageEntry.offset);
+		mountedPackage.openFile.read(compressedData.data.get(), compressedData.size);
+	}
 
 	// Decompress data from buffer
 	AssetData uncompressedData;
@@ -324,6 +329,7 @@ bool PackageManager::MountPackage(const std::string& source)
 	}
 
 	MountedPackage mountedPackage;
+	mountedPackage.seekMutex = std::make_unique<std::mutex>();
 
 	// Loop through toc and collect all entries
 	in.seekg(header.tableOfContentsOffset);
@@ -351,10 +357,16 @@ bool PackageManager::MountPackage(const std::string& source)
 		mountedPackage.tocByGuid.emplace(guid, entry.packageEntry);
 	}
 
-	mountedPackage.openFile = std::move(in);
 	std::string packageKey = sourcePath.stem().generic_string();
-	_mountedPackages.emplace(packageKey, std::move(mountedPackage)); // Have to use std::move as mountedPackage is non-copyable
-	_mountOrder.push_back(packageKey);
+
+	mountedPackage.openFile = std::move(in);
+	{
+		// Locking read/write during vector and unoredered map manipulation (thread safety)
+		std::unique_lock<std::shared_mutex> lock(_mountMutex);
+
+		_mountedPackages.emplace(packageKey, std::move(mountedPackage)); // Have to use std::move as mountedPackage is non-copyable
+		_mountOrder.push_back(packageKey);
+	}
 
 	if (DEBUG) {
 		std::cout << "Mounted package: |" << packageKey << "| with priority: " << _mountOrder.size() << std::endl;
@@ -365,6 +377,9 @@ bool PackageManager::MountPackage(const std::string& source)
 
 bool PackageManager::UnmountPackage()
 {
+	// Locks read/write during vector and unoredered map manipulation (thread safety)
+	std::unique_lock<std::shared_mutex> lock(_mountMutex);
+
 	// Removing the mounted package
 	if (_mountOrder.empty()) {
 		std::cerr << "PackageManager::UnmountPakckage(): No packages are currently mounted" << std::endl;
@@ -392,6 +407,9 @@ bool PackageManager::UnmountPackage()
 
 bool PackageManager::UnmountPackage(const std::string& packageKey)
 {
+	// Locks read/write during vector and unoredered map manipulation (thread safety)
+	std::unique_lock<std::shared_mutex> lock(_mountMutex);
+
 	// Removing the mounted package
 	auto packagePair = _mountedPackages.find(packageKey);
 	if (packagePair == _mountedPackages.end()) {
@@ -413,6 +431,9 @@ bool PackageManager::UnmountPackage(const std::string& packageKey)
 
 bool PackageManager::LoadAssetByGuid(const std::string& guid, AssetData& asset)
 {
+	// Locks write operations to mount containers (thread safety)
+	std::shared_lock<std::shared_mutex> mountLock(_mountMutex);
+
 	for (size_t i = _mountOrder.size(); i != 0; --i) {
 		std::string packageKey = _mountOrder.at(i - 1);
 
@@ -437,7 +458,10 @@ bool PackageManager::LoadAssetByGuid(const std::string& guid, AssetData& asset)
 }
 
 bool PackageManager::LoadAssetByPath(const std::string& path, AssetData& asset)
-{
+{	
+	// Locks write operations to mount containers (thread safety)
+	std::shared_lock<std::shared_mutex> mountLock(_mountMutex);
+
 	for (size_t i = _mountOrder.size(); i != 0; --i) {
 		std::string packageKey = _mountOrder.at(i - 1);
 

@@ -5,6 +5,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <vector>
+#include <shared_mutex>
 
 inline constexpr char SIGNATURE[8] = "GEPAKV0"; // Signature for files packaged by this package manager
 
@@ -31,6 +32,7 @@ struct TOCEntry {
 
 // Supports lookup by GUID and by path
 struct MountedPackage {
+	std::unique_ptr<std::mutex> seekMutex; // Used to prevent multiple packages seeking the file at once (pointer to ensure struct is moveable)
 	std::ifstream openFile; // Package file (open while mounted)
 	std::unordered_map<std::string, PackageEntry> tocByPath; // Key (string): name of the file inside the package (file.extension)
 	std::unordered_map<std::string, PackageEntry> tocByGuid; // Key (string): GUID of the asset found in its .meta file (file.extension.meta)
@@ -46,6 +48,8 @@ class PackageManager {
 private:
 	std::unordered_map<std::string, MountedPackage> _mountedPackages; // key (string): name of the package file (package.gepak)
 	std::vector<std::string> _mountOrder; // The order of which an asset loading functions checks packages for assets (back = highest priority)
+
+	std::shared_mutex _mountMutex; // Used to ensure that only one thread can mount and unmount at once
 
 	// Loads asset from a specified mounted package
 	bool LoadAsset(MountedPackage& mountedPackage, const PackageEntry& packageEntry, AssetData& asset);
