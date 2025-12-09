@@ -2,7 +2,7 @@
 
 // Program settings as constants
 
-#define DEBUG true
+#define DEBUG
 #define TRACK_MEMORY true
 
 // May be subject to change
