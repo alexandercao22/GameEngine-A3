@@ -83,28 +83,13 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	_camera.fovy = 90.0f;
 	_camera.projection = CAMERA_PERSPECTIVE;
 
-	//EntityEnemy *ent = new EntityEnemy;
-	//ent->Init();
-	//ent->GetTransform()->translation.x = 4.0f;
-	//_entities.push_back(ent);
-
-	//ent = new EntityEnemy;
-	//ent->Init();
-	//ent->GetTransform()->translation.y = 4.0f;
-	//_entities.push_back(ent);
-
-	//ent = new EntityEnemy;
-	//ent->Init();
-	//ent->GetTransform()->translation.x = 4.0f;
-	//ent->GetTransform()->translation.y = 4.0f;
-	//ent->GetTransform()->translation.z = 4.0f;
-	//_entities.push_back(ent);
-
+	const int numEnemies = 10000;
 	auto t0 = std::chrono::high_resolution_clock::now();
-	const int numEnemies = 10;
 	for (int i = 0; i < numEnemies; i++) {
 		EntityEnemy *ent = new EntityEnemy;
 		ent->Init();
+		ent->GetTransform()->translation.x = (int)(i / 10.0f) * 5;
+		ent->GetTransform()->translation.z = -(i % 10) * 5;
 		_entities.push_back(ent);
 	}
 	auto t1 = std::chrono::high_resolution_clock::now();
