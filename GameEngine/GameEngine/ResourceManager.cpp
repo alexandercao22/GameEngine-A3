@@ -134,7 +134,7 @@ Resource *ResourceManager::Load(std::string guid) {
 	
 	state.loading = true;
 	lock.unlock();
-
+	// Lägg till i jo
 	Resource* res = LoadFromDisk(_GUIDtoPath[guid], lock);
 
 	lock.lock();

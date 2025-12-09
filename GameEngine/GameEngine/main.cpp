@@ -11,6 +11,12 @@
 
 std::thread::id mainThreadID;
 
+enum class ModelColor
+{
+	Green,
+	Red
+};
+
 void threadFunction(MeshResource** resPtr) {
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 	ResourceManager& RM = ResourceManager::Instance();
@@ -26,6 +32,9 @@ int main() {
 	const int numThreads = 4;
 	std::vector<std::thread> threads;
 	std::vector<MeshResource*> resources;
+
+	MeshResource* res1 = dynamic_cast<MeshResource*>(ResourceManager::Instance().Load("69f74b0d-b87d-44b0-bb89-4fb94b5243c8"));
+	resources.emplace_back(res1);
 	for (int i = 0; i < numThreads; i++) {
 		MeshResource* res = nullptr;
 		resources.emplace_back(res);
@@ -37,9 +46,6 @@ int main() {
 	for (auto& t : threads) {
 		t.join();
 	}
-
-	MeshResource* res1 = dynamic_cast<MeshResource*>(ResourceManager::Instance().Load("69f74b0d-b87d-44b0-bb89-4fb94b5243c8"));
-	resources.emplace_back(res1);
 	std::cout << res1->GetRef() << std::endl;
 	std::cout << "Alla trådar är klara! " << std::endl;
 
@@ -62,9 +68,13 @@ int main() {
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		BeginMode3D(camera);
-
+		Color colors[] = { GREEN, RED, BLUE, PURPLE };
 		for (int i = 0; i < numThreads; i++) {
-			DrawModel(resources[i]->GetModel(), { -4.0f + i * 2, 2, 0 }, 1.0f, RED);
+			Color color = colors[i];
+			for (int k = 0; k < numThreads; k++) {
+				DrawModel(resources[i]->GetModel(), { -4.0f + i * 2, 2, 6.0f - k * 2 }, 1.0f, color);
+
+			}
 		}
 		
 		
