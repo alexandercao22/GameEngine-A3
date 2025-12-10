@@ -14,6 +14,7 @@
 
 #include "EntityEnemy.h"
 #include "EntityGoofy.h"
+#include "EntityMushroom.h"
 
 bool Scene::RenderInterface()
 {
@@ -83,31 +84,38 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	Mesh floorMesh = GenMeshPlane(40, 40, 1, 1);
 	_floor = LoadModelFromMesh(floorMesh);
 
+	for (int i = 1; i < 4; i++) {
+		std::string packagePath = "Resources/Level" + std::to_string(i);
+		if (!ResourceManager::Instance().GetPackageManager()->Pack(packagePath, "Resources")) {
+			std::cerr << "Scene::Init(): Could not pack package:" << packagePath << std::endl;;
+		}
+
+		packagePath += ".gepak";
+		if (!ResourceManager::Instance().GetPackageManager()->MountPackage(packagePath)) {
+			std::cerr << "Scene::Init(): Could not load package: " << packagePath << std::endl;
+			return false;
+		}
+	}
+
 	//Initialize the parts
-	ScenePart* part2 = new ScenePart;
-	part2->Init({-40,0,0}, "Resources/niva1.gepak");
-	_parts.push_back(part2);
+	ScenePart* level1 = new ScenePart; // BLUE
+	level1->Init({ -40, 0, 0 }, "Resources/Level1.gepak");
+	_parts.push_back(level1);
 
-	ScenePart* part3 = new ScenePart;
-	part3->Init({0,0,-40}, "Resources/Mesh.gepak");
-	_parts.push_back(part3);
+	ScenePart* level2 = new ScenePart; // GREEN
+	level2->Init({ 0, 0, -40 }, "Resources/Level2.gepak");
+	_parts.push_back(level2);
 
-	ScenePart* part4 = new ScenePart;
-	part4->Init({-40,0,-40}, "Resources/Mesh.gepak");
-	_parts.push_back(part4);
+	ScenePart* level3= new ScenePart; // RED
+	level3->Init({ -40, 0, -40 }, "Resources/Level3.gepak");
+	_parts.push_back(level3);
 
-	std::string packagePath = "Resources/Mesh.gepak";
-	if (!ResourceManager::Instance().GetPackageManager()->MountPackage(packagePath)) {
-		std::cerr << "Scene::Init(): Could not load package: " << packagePath << std::endl;
-		return false;
-	}
-
-	std::string texturesPkg = "Resources/Textures.gepak";
-	ResourceManager::Instance().GetPackageManager()->Pack("Resources/Textures", "Resources");
-	if (!ResourceManager::Instance().GetPackageManager()->MountPackage(texturesPkg)) {
-		std::cerr << "Scene::Init(): Could not load package: " << texturesPkg << std::endl;
-		return false;
-	}
+	//std::string texturesPkg = "Resources/Textures.gepak";
+	//ResourceManager::Instance().GetPackageManager()->Pack("Resources/Textures", "Resources");
+	//if (!ResourceManager::Instance().GetPackageManager()->MountPackage(texturesPkg)) {
+	//	std::cerr << "Scene::Init(): Could not load package: " << texturesPkg << std::endl;
+	//	return false;
+	//}
 
 	// Initialize camera
 	_camera.position = { 0.0f, 2.0f, 10.0f };
@@ -122,26 +130,6 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	t->translation = { 0.0f, 0.0f, 100.0f };
 	t->scale = { 50.0f, 50.0f, 50.0f };
 	_entities.push_back(goofy);
-
-#ifdef TEST
-	const int numEnemies = 100;
-	const int numRow = 10;
-	auto t0 = std::chrono::high_resolution_clock::now();
-	for (int i = 0; i < numEnemies; i++) {
-		EntityEnemy *ent = new EntityEnemy;
-		ent->Init();
-		Transform *t = ent->GetTransform();
-		t->translation.x = (int)(i / numRow) * -5;
-		t->translation.z = (i % numRow) * -5;
-		_entities.push_back(ent);
-	}
-	auto t1 = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double> duration = t1 - t0;
-
-#ifdef DEBUG
-	std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
-#endif // DEBUG
-#endif // TEST
 
 	return true;
 }
@@ -169,9 +157,9 @@ bool Scene::Update()
 	}
 
 	int size = ResourceManager::Instance().GetThreadDataSize();
-#ifdef DEBUG
-	std::cout << size << std::endl;
-#endif
+//#ifdef DEBUG
+//	std::cout << "ThreadDataSize: " << size << std::endl;
+//#endif
 	if ( size > 0) {
 		// Load the model or texture from the data in ThreadData datastructure
 		// All this complexity would not be necessary if we did not use Raylib
@@ -187,6 +175,89 @@ bool Scene::Update()
 				ResourceManager::Instance().AddPackage(path);
 			}
 		}
+	}
+
+	// BLUE part
+	static bool blueHasLoaded = false;
+	if (_parts.size() > 0 && !blueHasLoaded &&
+		_parts[0]->CheckDistance(_camera.position) && _parts[0]->IsLoaded()) {
+		blueHasLoaded = true;
+		int numEnemies = 100;
+#ifdef TEST
+		numEnemies = 10000;
+#endif
+		const int numRow = 10;
+		auto t0 = std::chrono::high_resolution_clock::now();
+		for (int i = 0; i < numEnemies; i++) {
+			EntityEnemy *ent = new EntityEnemy;
+			ent->Init();
+			Transform *t = ent->GetTransform();
+			t->translation.x = (int)(i / numRow) * -5;
+			t->translation.z = (i % numRow) * -5;
+			_entities.push_back(ent);
+		}
+		auto t1 = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> duration = t1 - t0;
+
+#ifdef DEBUG
+		std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
+#endif
+	}
+
+	// GREEN part
+	static bool greenHasLoaded = false;
+	if (_parts.size() > 1 && !greenHasLoaded &&
+		_parts[1]->CheckDistance(_camera.position) && _parts[1]->IsLoaded()) {
+		greenHasLoaded = true;
+		int numEnemies = 100;
+#ifdef TEST
+		numEnemies = 10000;
+#endif
+		const int numRow = 10;
+		auto t0 = std::chrono::high_resolution_clock::now();
+		for (int i = 0; i < numEnemies; i++) {
+			EntityGoofy *ent = new EntityGoofy;
+			ent->Init();
+			Transform *t = ent->GetTransform();
+			t->translation.x = (int)(i / numRow) * -20;
+			t->translation.y = 10.0f;
+			t->translation.z = (i % numRow) * -10;
+			t->scale = { 10.0f, 10.0f, 10.0f };
+			_entities.push_back(ent);
+		}
+		auto t1 = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> duration = t1 - t0;
+
+#ifdef DEBUG
+		std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
+#endif
+	}
+
+	// RED part
+	static bool redHasLoaded = false;
+	if (_parts.size() > 2 && !redHasLoaded &&
+		_parts[2]->CheckDistance(_camera.position) && _parts[2]->IsLoaded()) {
+		redHasLoaded = true;
+		int numEnemies = 100;
+#ifdef TEST
+		numEnemies = 10000;
+#endif
+		const int numRow = 10;
+		auto t0 = std::chrono::high_resolution_clock::now();
+		for (int i = 0; i < numEnemies; i++) {
+			EntityMushroom *ent = new EntityMushroom;
+			ent->Init();
+			Transform *t = ent->GetTransform();
+			t->translation.x = (int)(i / numRow) * -2;
+			t->translation.z = (i % numRow) * -2;
+			_entities.push_back(ent);
+		}
+		auto t1 = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> duration = t1 - t0;
+
+#ifdef DEBUG
+		std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
+#endif
 	}
 
 	if (!_showCursor) {
@@ -207,7 +278,7 @@ bool Scene::RenderUpdate()
 	//	return false;
 	//}
 
-	Color colors[4] = { GREEN, DARKGREEN, LIME, BROWN };
+	Color colors[4] = { RED, GREEN, BLUE, YELLOW };
 	int j = 0;
 	for (int i = 0; i < 2; i++) {
 		for (int k = 0; k < 2; k++) {
@@ -223,7 +294,7 @@ bool Scene::RenderUpdate()
 		Vector3 camToEnt = Vector3Normalize(transform->translation - _camera.position);
 		Vector3 camForward = Vector3Normalize(_camera.target - _camera.position);
 		float dot = Vector3DotProduct(camToEnt, camForward);
-		if (dot < cos(DEG2RAD * (_camera.fovy / 2))) {
+		if (dot < cos((_camera.fovy / 2))) {
 			continue;
 		}
 
