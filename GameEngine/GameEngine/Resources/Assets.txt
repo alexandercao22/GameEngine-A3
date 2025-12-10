@@ -1,4 +1,0 @@
-69f74b0d-b87d-44b0-bb89-4fb94b5243c8:Mesh:Resources/mushroom.obj
-2fe16579-8532-47b5-a6d4-a36f22611c3c:Texture:Resources/cubemaps_skybox.png
-90c94e91-dd63-441f-9372-b12a77b8036a:Mesh:Resources/cubeWithTexture.obj
-27471003-7f27-42e3-a791-c159b33f5198:Mesh:Resources/Duck.gltf
