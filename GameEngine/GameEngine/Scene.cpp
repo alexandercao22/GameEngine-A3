@@ -83,20 +83,18 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	Mesh floorMesh = GenMeshPlane(40, 40, 1, 1);
 	_floor = LoadModelFromMesh(floorMesh);
 
+	//Initialize the parts
+	ScenePart* part2 = new ScenePart;
+	part2->Init({-40,0,0}, "Resources/niva1.gepak");
+	_parts.push_back(part2);
 
-	
-		//Initialize the parts
-		ScenePart* part2 = new ScenePart;
-		part2->Init({-40,0,0}, "Resources/niva1.gepak");
-		_parts.push_back(part2);
+	ScenePart* part3 = new ScenePart;
+	part3->Init({0,0,-40}, "Resources/Mesh.gepak");
+	_parts.push_back(part3);
 
-		ScenePart* part3 = new ScenePart;
-		part3->Init({0,0,-40}, "Resources/Mesh.gepak");
-		_parts.push_back(part3);
-
-		ScenePart* part4 = new ScenePart;
-		part4->Init({-40,0,-40}, "Resources/Mesh.gepak");
-		_parts.push_back(part4);
+	ScenePart* part4 = new ScenePart;
+	part4->Init({-40,0,-40}, "Resources/Mesh.gepak");
+	_parts.push_back(part4);
 
 	std::string packagePath = "Resources/Mesh.gepak";
 	if (!ResourceManager::Instance().GetPackageManager()->MountPackage(packagePath)) {
@@ -125,6 +123,7 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	t->scale = { 50.0f, 50.0f, 50.0f };
 	_entities.push_back(goofy);
 
+#ifdef TEST
 	const int numEnemies = 100;
 	const int numRow = 10;
 	auto t0 = std::chrono::high_resolution_clock::now();
@@ -141,7 +140,8 @@ bool Scene::Init(unsigned int width, unsigned int height)
 
 #ifdef DEBUG
 	std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
-#endif
+#endif // DEBUG
+#endif // TEST
 
 	return true;
 }
@@ -158,16 +158,16 @@ bool Scene::Update()
 		with the data. 
 	*/
 
-	static bool mouseLocked = false;
-	if (IsKeyPressed(KEY_V))
-	{
-		mouseLocked = !mouseLocked;
-
-		if (mouseLocked)
-			DisableCursor();
-		else
+	if (IsKeyPressed(KEY_C)) {
+		_showCursor = !_showCursor;
+		if (_showCursor) {
 			EnableCursor();
+		}
+		else {
+			DisableCursor();
+		}
 	}
+
 	int size = ResourceManager::Instance().GetThreadDataSize();
 #ifdef DEBUG
 	std::cout << size << std::endl;
@@ -180,19 +180,19 @@ bool Scene::Update()
 	}
 
 	for (auto& part : _parts) {
-		
-
 		if (part->CheckDistance(_camera.position)) {
 			if (!part->IsLoaded()) {
 				// Load
 				std::string path = part->GetPath();
 				ResourceManager::Instance().AddPackage(path);
-
 			}
 		}
 	}
 
-	UpdateCamera(&_camera, CAMERA_FREE);
+	if (!_showCursor) {
+		UpdateCamera(&_camera, CAMERA_FREE);
+	}
+
 	return true;
 }
 
@@ -207,21 +207,7 @@ bool Scene::RenderUpdate()
 	//	return false;
 	//}
 
-	if (IsKeyPressed(KEY_C)) {
-		_showCursor = !_showCursor;
-		if (_showCursor) {
-			EnableCursor();
-		}
-		else {
-			DisableCursor();
-		}
-	}
-
-	if (!_showCursor) {
-		UpdateCamera(&_camera, CAMERA_FREE);
-	}
 	Color colors[4] = { GREEN, DARKGREEN, LIME, BROWN };
-
 	int j = 0;
 	for (int i = 0; i < 2; i++) {
 		for (int k = 0; k < 2; k++) {
