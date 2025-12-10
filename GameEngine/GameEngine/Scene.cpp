@@ -83,31 +83,38 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	Mesh floorMesh = GenMeshPlane(40, 40, 1, 1);
 	_floor = LoadModelFromMesh(floorMesh);
 
+	for (int i = 1; i < 4; i++) {
+		std::string packagePath = "Resources/Level" + std::to_string(i);
+		if (!ResourceManager::Instance().GetPackageManager()->Pack(packagePath, "Resources")) {
+			std::cerr << "Scene::Init(): Could not pack package:" << packagePath << std::endl;;
+		}
+
+		packagePath += ".gepak";
+		if (!ResourceManager::Instance().GetPackageManager()->MountPackage(packagePath)) {
+			std::cerr << "Scene::Init(): Could not load package: " << packagePath << std::endl;
+			return false;
+		}
+	}
+
 	//Initialize the parts
-	ScenePart* part2 = new ScenePart; // BLUE
-	part2->Init({-40,0,0}, "Resources/niva1.gepak");
-	_parts.push_back(part2);
+	ScenePart* level1 = new ScenePart; // BLUE
+	level1->Init({ -40, 0, 0 }, "Resources/Level1.gepak");
+	_parts.push_back(level1);
 
-	ScenePart* part3 = new ScenePart; // GREEN
-	part3->Init({0,0,-40}, "Resources/Meshes.gepak");
-	_parts.push_back(part3);
+	ScenePart* level2 = new ScenePart; // GREEN
+	level2->Init({ 0, 0, -40 }, "Resources/Level2.gepak");
+	_parts.push_back(level2);
 
-	ScenePart* part4 = new ScenePart; // RED
-	part4->Init({-40,0,-40}, "Resources/Meshes.gepak");
-	_parts.push_back(part4);
+	ScenePart* level3= new ScenePart; // RED
+	level3->Init({ -40, 0, -40 }, "Resources/Level3.gepak");
+	_parts.push_back(level3);
 
-	std::string packagePath = "Resources/Meshes.gepak";
-	if (!ResourceManager::Instance().GetPackageManager()->MountPackage(packagePath)) {
-		std::cerr << "Scene::Init(): Could not load package: " << packagePath << std::endl;
-		return false;
-	}
-
-	std::string texturesPkg = "Resources/Textures.gepak";
-	ResourceManager::Instance().GetPackageManager()->Pack("Resources/Textures", "Resources");
-	if (!ResourceManager::Instance().GetPackageManager()->MountPackage(texturesPkg)) {
-		std::cerr << "Scene::Init(): Could not load package: " << texturesPkg << std::endl;
-		return false;
-	}
+	//std::string texturesPkg = "Resources/Textures.gepak";
+	//ResourceManager::Instance().GetPackageManager()->Pack("Resources/Textures", "Resources");
+	//if (!ResourceManager::Instance().GetPackageManager()->MountPackage(texturesPkg)) {
+	//	std::cerr << "Scene::Init(): Could not load package: " << texturesPkg << std::endl;
+	//	return false;
+	//}
 
 	// Initialize camera
 	_camera.position = { 0.0f, 2.0f, 10.0f };
@@ -169,10 +176,15 @@ bool Scene::Update()
 		}
 	}
 
-	static bool hasLoaded = false;
-	if (!hasLoaded && _parts[0]->IsLoaded()) {
+	// BLUE part
+	static bool blueHasLoaded = false;
+	if (_parts.size() > 0 && !blueHasLoaded &&
+		_parts[0]->CheckDistance(_camera.position) && _parts[0]->IsLoaded()) {
+		blueHasLoaded = true;
+		int numEnemies = 100;
 #ifdef TEST
-		const int numEnemies = 100;
+		numEnemies = 10000;
+#endif
 		const int numRow = 10;
 		auto t0 = std::chrono::high_resolution_clock::now();
 		for (int i = 0; i < numEnemies; i++) {
@@ -186,11 +198,9 @@ bool Scene::Update()
 		auto t1 = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> duration = t1 - t0;
 
-		hasLoaded = true;
 #ifdef DEBUG
 		std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
-#endif // DEBUG
-#endif // TEST
+#endif
 	}
 
 	if (!_showCursor) {
