@@ -123,26 +123,6 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	t->scale = { 50.0f, 50.0f, 50.0f };
 	_entities.push_back(goofy);
 
-#ifdef TEST
-	const int numEnemies = 100;
-	const int numRow = 10;
-	auto t0 = std::chrono::high_resolution_clock::now();
-	for (int i = 0; i < numEnemies; i++) {
-		EntityEnemy *ent = new EntityEnemy;
-		ent->Init();
-		Transform *t = ent->GetTransform();
-		t->translation.x = (int)(i / numRow) * -5;
-		t->translation.z = (i % numRow) * -5;
-		_entities.push_back(ent);
-	}
-	auto t1 = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double> duration = t1 - t0;
-
-#ifdef DEBUG
-	std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
-#endif // DEBUG
-#endif // TEST
-
 	return true;
 }
 
@@ -169,9 +149,9 @@ bool Scene::Update()
 	}
 
 	int size = ResourceManager::Instance().GetThreadDataSize();
-#ifdef DEBUG
-	std::cout << size << std::endl;
-#endif
+//#ifdef DEBUG
+//	std::cout << "ThreadDataSize: " << size << std::endl;
+//#endif
 	if ( size > 0) {
 		// Load the model or texture from the data in ThreadData datastructure
 		// All this complexity would not be necessary if we did not use Raylib
@@ -187,6 +167,30 @@ bool Scene::Update()
 				ResourceManager::Instance().AddPackage(path);
 			}
 		}
+	}
+
+	static bool hasLoaded = false;
+	if (!hasLoaded && _parts[0]->IsLoaded()) {
+#ifdef TEST
+		const int numEnemies = 100;
+		const int numRow = 10;
+		auto t0 = std::chrono::high_resolution_clock::now();
+		for (int i = 0; i < numEnemies; i++) {
+			EntityEnemy *ent = new EntityEnemy;
+			ent->Init();
+			Transform *t = ent->GetTransform();
+			t->translation.x = (int)(i / numRow) * -5;
+			t->translation.z = (i % numRow) * -5;
+			_entities.push_back(ent);
+		}
+		auto t1 = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> duration = t1 - t0;
+
+		hasLoaded = true;
+#ifdef DEBUG
+		std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
+#endif // DEBUG
+#endif // TEST
 	}
 
 	if (!_showCursor) {
