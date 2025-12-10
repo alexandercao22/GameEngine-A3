@@ -29,7 +29,6 @@ bool Scene::RenderInterface()
 			std::string file = "Resources/" + path.substr(backslash, path.length() - backslash);
 			std::cout << file << std::endl;
 
-			//ResourceManager::Instance().SaveGUID(file);
 		}
 	}
 
@@ -37,16 +36,13 @@ bool Scene::RenderInterface()
 	ImGui::InputText("File", buf, IM_ARRAYSIZE(buf));
 	if (ImGui::Button("Load")) {
 		std::string path = "Resource/" + std::string(buf);
-		//ResourceManager::Instance().SaveGUID(path);
 	}
 	ImGui::Separator();
 	ImGui::Text("Camera Position:");
 	ImGui::BulletText("X: %.2f", _camera.position.x);
 	ImGui::BulletText("Y: %.2f", _camera.position.y);
 	ImGui::BulletText("Z: %.2f", _camera.position.z);
-	ImGui::Text("Distance: %s", _test.c_str());
 	ImGui::Separator();
-	ImGui::Text("CachedResources:", _test.c_str());
 
 	std::vector<std::string> resources = ResourceManager::Instance().GetCachedResources();
 	for (int i = 0; i < resources.size(); i++) {
@@ -86,11 +82,6 @@ bool Scene::Init(unsigned int width, unsigned int height)
 
 	
 		//Initialize the parts
-
-		/*ScenePart part1;
-		part1.Init({0,0,0}, "Resources/Mesh.gepak");
-		_parts.push_back(part1);*/
-
 		ScenePart* part2 = new ScenePart;
 		part2->Init({-40,0,0}, "Resources/niva1.gepak");
 		_parts.push_back(part2);
@@ -102,11 +93,6 @@ bool Scene::Init(unsigned int width, unsigned int height)
 		ScenePart* part4 = new ScenePart;
 		part4->Init({-40,0,-40}, "Resources/Mesh.gepak");
 		_parts.push_back(part4);
-
-	/*	ResourceManager::Instance().GetPackageManager()->MountPackage(part1.GetPath()) {
-			std::cerr << blablabla << std::endl;
-		}
-	*/
 
 	std::string packagePath = "Resources/Mesh.gepak";
 	if (!ResourceManager::Instance().GetPackageManager()->MountPackage(packagePath)) {
@@ -134,7 +120,6 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	ent = new EntityEnemy;
 	ent->Init();
 	ent->GetTransform()->translation.x = -40.0f;
-	//ent->GetTransform()->translation.y = 4.0f;
 	ent->GetTransform()->translation.z = -40.0f;
 	_entities.push_back(ent);
 
@@ -151,8 +136,6 @@ bool Scene::Update()
 
 		Check if the RM queue is empty. If not, load the model/texture
 		with the data. 
-
-
 	*/
 
 	static bool mouseLocked = false;
@@ -182,7 +165,6 @@ bool Scene::Update()
 		if (part->CheckDistance(_camera.position)) {
 			if (!part->IsLoaded()) {
 				// Load
-				_test = "What are you doin heare?";
 				std::string path = part->GetPath();
 				ResourceManager::Instance().AddPackage(path);
 

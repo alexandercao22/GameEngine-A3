@@ -79,7 +79,6 @@ public:
 
 
 	// Get the thread loaded package to load all resources
-	//MountedPackage GetMountedPackage();
 	std::vector<std::string> GetGUIDsInPackage(const std::string& packageKey);
 	std::vector<std::string> GetGUIDsInLastMountedPackage();
 };

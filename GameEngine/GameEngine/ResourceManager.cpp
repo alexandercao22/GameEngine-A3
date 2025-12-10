@@ -111,7 +111,7 @@ bool ResourceManager::AddPackage(std::string path) {
 }
 
 void ResourceManager::WorkerThread() {
-	// This thread will run in
+	// This thread will run in parallel
 	while (true) {
 		std::string package;
 		{
@@ -121,18 +121,15 @@ void ResourceManager::WorkerThread() {
 			package = std::move(_newPackage.front());
 			_newPackage.erase(_newPackage.begin());
 		}
-		//if (!_newPackage.empty()) {
 #ifdef TEST
 		auto t0 = std::chrono::high_resolution_clock::now();
 #endif		
 		if (!_packageManager.MountPackage(package)) {
 				std::cerr << "ResourceManager::MountPackage(): Could not mount package" << std::endl;
 			}
-			//MountedPackage pack = _packageManager.GetMountedPackage();
 			
 			std::vector<std::string> guids = _packageManager.GetGUIDsInLastMountedPackage();
 
-			//std::string guid = pack.tocByGuid[];
 			for (const std::string& guid : guids) {
 
 				AssetData data;
@@ -157,7 +154,7 @@ int ResourceManager::GetThreadDataSize() {
 }
 
 bool ResourceManager::LoadObject(Resource* &resource) {
-	//std::mutex _threadDataMutex;
+
 #ifdef TEST
 	auto t0 = std::chrono::high_resolution_clock::now();
 #endif
