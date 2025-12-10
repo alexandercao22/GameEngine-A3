@@ -77,7 +77,7 @@ public:
 	// Loads asset specified by key (path relative to the package that holds it)
 	bool LoadAssetByKey(const std::string& key, AssetData& asset);
 
-	// Gets all GUID's in the given package
+	// Get the thread loaded package to load all resources
 	std::vector<std::string> GetGUIDsInPackage(const std::string& packageKey);
 	// Gets all GUID's in the package with the highest priority
 	std::vector<std::string> GetGUIDsInLastMountedPackage();

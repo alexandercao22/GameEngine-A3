@@ -6,6 +6,8 @@ ResourceManager::ResourceManager() {
 	workerThread.back().detach();
 }
 
+#include "GuidUtils.h"
+
 ResourceManager::~ResourceManager() {
 	
 	for (auto pair : _cachedResources) {
@@ -14,6 +16,11 @@ ResourceManager::~ResourceManager() {
 }
 
 bool ResourceManager::LoadResource(std::string guid, Resource *&resource) {
+	if (guid.length() != GUID_STR_LENGTH) {
+		std::cerr << "ResourceManager::LoadResource(): GUID is invalid" << std::endl;
+		return false;
+	}
+
 	auto pair = _cachedResources.find(guid);
 	if (pair != _cachedResources.end()) {
 		// Resource already exists in cache
@@ -57,7 +64,7 @@ bool ResourceManager::UnloadResource(std::string guid) {
 	if (ref == 1) {
 		// References goes to 0 -> remove resource from cache
 		_memoryUsed -= _cachedResources[guid]->GetMemoryUsage();
-		_cachedResources[guid]->UnLoad();
+		_cachedResources[guid]->Unload();
 		_cachedResources.erase(guid);
 		return true;
 	}
@@ -111,7 +118,7 @@ bool ResourceManager::AddPackage(std::string path) {
 }
 
 void ResourceManager::WorkerThread() {
-	// This thread will run in
+	// This thread will run in parallel
 	while (true) {
 		std::string package;
 		{
@@ -121,18 +128,15 @@ void ResourceManager::WorkerThread() {
 			package = std::move(_newPackage.front());
 			_newPackage.erase(_newPackage.begin());
 		}
-		//if (!_newPackage.empty()) {
 #ifdef TEST
 		auto t0 = std::chrono::high_resolution_clock::now();
 #endif		
 		if (!_packageManager.MountPackage(package)) {
 				std::cerr << "ResourceManager::MountPackage(): Could not mount package" << std::endl;
 			}
-			//MountedPackage pack = _packageManager.GetMountedPackage();
 			
 			std::vector<std::string> guids = _packageManager.GetGUIDsInLastMountedPackage();
 
-			//std::string guid = pack.tocByGuid[];
 			for (const std::string& guid : guids) {
 
 				AssetData data;
@@ -157,7 +161,7 @@ int ResourceManager::GetThreadDataSize() {
 }
 
 bool ResourceManager::LoadObject(Resource* &resource) {
-	//std::mutex _threadDataMutex;
+
 #ifdef TEST
 	auto t0 = std::chrono::high_resolution_clock::now();
 #endif

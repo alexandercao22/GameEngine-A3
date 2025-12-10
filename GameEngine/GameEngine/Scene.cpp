@@ -1,15 +1,19 @@
 #include "Scene.h"
+#include "Settings.h"
 
 #include "imgui.h"
 #include "rlImGui.h"
+#include "raymath.h"
 
 #include "WinFileDialog.h"
+#include <chrono>
 
 #include "ResourceManager.h"
 #include "MeshResource.h"
 #include "TextureResource.h"
 
-//#define DEBUG
+#include "EntityEnemy.h"
+#include "EntityGoofy.h"
 
 bool Scene::RenderInterface()
 {
@@ -29,7 +33,6 @@ bool Scene::RenderInterface()
 			std::string file = "Resources/" + path.substr(backslash, path.length() - backslash);
 			std::cout << file << std::endl;
 
-			//ResourceManager::Instance().SaveGUID(file);
 		}
 	}
 
@@ -37,16 +40,13 @@ bool Scene::RenderInterface()
 	ImGui::InputText("File", buf, IM_ARRAYSIZE(buf));
 	if (ImGui::Button("Load")) {
 		std::string path = "Resource/" + std::string(buf);
-		//ResourceManager::Instance().SaveGUID(path);
 	}
 	ImGui::Separator();
 	ImGui::Text("Camera Position:");
 	ImGui::BulletText("X: %.2f", _camera.position.x);
 	ImGui::BulletText("Y: %.2f", _camera.position.y);
 	ImGui::BulletText("Z: %.2f", _camera.position.z);
-	ImGui::Text("Distance: %s", _test.c_str());
 	ImGui::Separator();
-	ImGui::Text("CachedResources:", _test.c_str());
 
 	std::vector<std::string> resources = ResourceManager::Instance().GetCachedResources();
 	for (int i = 0; i < resources.size(); i++) {
@@ -77,7 +77,7 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	_height = height;
 
 	InitWindow(_width, _height, "Game Engine Assignment 3");
-	SetTargetFPS(60);
+	//SetTargetFPS(60);
 	rlImGuiSetup(true);
 
 	Mesh floorMesh = GenMeshPlane(40, 40, 1, 1);
@@ -86,11 +86,6 @@ bool Scene::Init(unsigned int width, unsigned int height)
 
 	
 		//Initialize the parts
-
-		/*ScenePart part1;
-		part1.Init({0,0,0}, "Resources/Mesh.gepak");
-		_parts.push_back(part1);*/
-
 		ScenePart* part2 = new ScenePart;
 		part2->Init({-40,0,0}, "Resources/niva1.gepak");
 		_parts.push_back(part2);
@@ -103,14 +98,16 @@ bool Scene::Init(unsigned int width, unsigned int height)
 		part4->Init({-40,0,-40}, "Resources/Mesh.gepak");
 		_parts.push_back(part4);
 
-	/*	ResourceManager::Instance().GetPackageManager()->MountPackage(part1.GetPath()) {
-			std::cerr << blablabla << std::endl;
-		}
-	*/
-
 	std::string packagePath = "Resources/Mesh.gepak";
 	if (!ResourceManager::Instance().GetPackageManager()->MountPackage(packagePath)) {
 		std::cerr << "Scene::Init(): Could not load package: " << packagePath << std::endl;
+		return false;
+	}
+
+	std::string texturesPkg = "Resources/Textures.gepak";
+	ResourceManager::Instance().GetPackageManager()->Pack("Resources/Textures", "Resources");
+	if (!ResourceManager::Instance().GetPackageManager()->MountPackage(texturesPkg)) {
+		std::cerr << "Scene::Init(): Could not load package: " << texturesPkg << std::endl;
 		return false;
 	}
 
@@ -121,22 +118,30 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	_camera.fovy = 90.0f;
 	_camera.projection = CAMERA_PERSPECTIVE;
 
-	EntityEnemy *ent = new EntityEnemy;
-	ent->Init();
-	ent->GetTransform()->translation.x = -40.0f;
-	_entities.push_back(ent);
+	EntityGoofy *goofy = new EntityGoofy;
+	goofy->Init();
+	Transform *t = goofy->GetTransform();
+	t->translation = { 0.0f, 0.0f, 100.0f };
+	t->scale = { 50.0f, 50.0f, 50.0f };
+	_entities.push_back(goofy);
 
-	ent = new EntityEnemy;
-	ent->Init();
-	ent->GetTransform()->translation.z = -40.0f;
-	_entities.push_back(ent);
+	const int numEnemies = 100;
+	const int numRow = 10;
+	auto t0 = std::chrono::high_resolution_clock::now();
+	for (int i = 0; i < numEnemies; i++) {
+		EntityEnemy *ent = new EntityEnemy;
+		ent->Init();
+		Transform *t = ent->GetTransform();
+		t->translation.x = (int)(i / numRow) * -5;
+		t->translation.z = (i % numRow) * -5;
+		_entities.push_back(ent);
+	}
+	auto t1 = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> duration = t1 - t0;
 
-	ent = new EntityEnemy;
-	ent->Init();
-	ent->GetTransform()->translation.x = -40.0f;
-	//ent->GetTransform()->translation.y = 4.0f;
-	ent->GetTransform()->translation.z = -40.0f;
-	_entities.push_back(ent);
+#ifdef DEBUG
+	std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
+#endif
 
 	return true;
 }
@@ -151,8 +156,6 @@ bool Scene::Update()
 
 		Check if the RM queue is empty. If not, load the model/texture
 		with the data. 
-
-
 	*/
 
 	static bool mouseLocked = false;
@@ -182,7 +185,6 @@ bool Scene::Update()
 		if (part->CheckDistance(_camera.position)) {
 			if (!part->IsLoaded()) {
 				// Load
-				_test = "What are you doin heare?";
 				std::string path = part->GetPath();
 				ResourceManager::Instance().AddPackage(path);
 
@@ -201,9 +203,9 @@ bool Scene::RenderUpdate()
 	rlImGuiBegin();
 	BeginMode3D(_camera);
 
-	if (!RenderInterface()) {
-		return false;
-	}
+	//if (!RenderInterface()) {
+	//	return false;
+	//}
 
 	if (IsKeyPressed(KEY_C)) {
 		_showCursor = !_showCursor;
@@ -230,6 +232,15 @@ bool Scene::RenderUpdate()
 
 	for (Entity *ent : _entities) {
 		Transform *transform = ent->GetTransform();
+
+		// Frustum culling (kind of)
+		Vector3 camToEnt = Vector3Normalize(transform->translation - _camera.position);
+		Vector3 camForward = Vector3Normalize(_camera.target - _camera.position);
+		float dot = Vector3DotProduct(camToEnt, camForward);
+		if (dot < cos(DEG2RAD * (_camera.fovy / 2))) {
+			continue;
+		}
+
 		MeshResource *mesh = ent->GetMesh();
 		TextureResource *texture = ent->GetTexture();
 		if (mesh != nullptr) {
@@ -248,6 +259,7 @@ bool Scene::RenderUpdate()
 	DrawGrid(40, 1.0f);
 
 	EndMode3D();
+	DrawFPS(0, 0);
 	rlImGuiEnd();
 	EndDrawing();
 

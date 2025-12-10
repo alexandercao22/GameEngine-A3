@@ -11,7 +11,6 @@ bool ScenePart::Init(Vector3 pos, std::string path) {
 }
 
 std::string ScenePart::GetPath() {
-	//_loaded = true;
 	SetLoaded(true);
 	return _pathToPackage;
 }

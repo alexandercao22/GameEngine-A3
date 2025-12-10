@@ -1,19 +1,18 @@
-#include "EntityEnemy.h"
+#include "EntityGoofy.h"
+
+#include <iostream>
 
 #include "ResourceManager.h"
-#include "Resource.h"
-#include "MeshResource.h"
-#include "TextureResource.h"
 
-EntityEnemy::~EntityEnemy()
+EntityGoofy::~EntityGoofy()
 {
-    ResourceManager::Instance().UnloadResource("5f1e388c-39c4-471d-bfa2-727ab986dd1c");
-    ResourceManager::Instance().UnloadResource("4fee39f8-43fc-46ba-9263-2081981e4637");
+    ResourceManager::Instance().UnloadResource("2ed278c8-3fd8-48fc-9ed9-72258ce32ddc");
+    ResourceManager::Instance().UnloadResource("0c90b967-b4af-40fe-a0ab-719e95ffd424");
     delete _mesh;
     delete _texture;
 }
 
-bool EntityEnemy::Init()
+bool EntityGoofy::Init()
 {
     if (_mesh || _texture) {
         std::cerr << "EntityEnemey::Init(): Enemy is already initialized" << std::endl;
@@ -21,7 +20,7 @@ bool EntityEnemy::Init()
     }
 
     Resource *mesh = new MeshResource;
-    if (!ResourceManager::Instance().LoadResource("5f1e388c-39c4-471d-bfa2-727ab986dd1c", mesh)) {
+    if (!ResourceManager::Instance().LoadResource("2ed278c8-3fd8-48fc-9ed9-72258ce32ddc", mesh)) {
         std::cerr << "EntityEnemy::Init(): Failed to load mesh" << std::endl;
         delete mesh;
         return false;
@@ -29,7 +28,7 @@ bool EntityEnemy::Init()
     _mesh = (MeshResource *)mesh;
 
     Resource *texture = new TextureResource;
-    if (!ResourceManager::Instance().LoadResource("4fee39f8-43fc-46ba-9263-2081981e4637", texture)) {
+    if (!ResourceManager::Instance().LoadResource("0c90b967-b4af-40fe-a0ab-719e95ffd424", texture)) {
         std::cerr << "EntityEnemy::Init(): Failed to load texture" << std::endl;
         delete texture;
     }
@@ -37,11 +36,5 @@ bool EntityEnemy::Init()
         _texture = (TextureResource *)texture;
     }
 
-    return true;
-}
-
-bool EntityEnemy::Update()
-{
-    // Do something... like update _health
     return true;
 }

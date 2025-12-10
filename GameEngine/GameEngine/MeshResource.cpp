@@ -83,6 +83,6 @@ Model MeshResource::GetModel() {
 	return _model;
 }
 
-void MeshResource::UnLoad() {
+void MeshResource::Unload() {
 	UnloadModel(_model);
 }

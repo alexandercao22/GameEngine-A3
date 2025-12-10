@@ -42,9 +42,9 @@ namespace GuidUtils {
 			}
 		}
 
-		if (DEBUG) {
+#ifdef DEBUG
 			std::cout << "Generated GUID: " << ss.str() << std::endl;
-		}
+#endif
 
 		return ss.str();
 	}
@@ -126,9 +126,9 @@ namespace GuidUtils {
 			return false;
 		}
 
-		if (DEBUG) {
+#ifdef DEBUG
 			std::cout << "Created meta file for " << assetPath << std::endl;
-		}
+#endif
 
 		return true;
 	}
