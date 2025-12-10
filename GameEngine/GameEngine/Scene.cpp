@@ -94,7 +94,7 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	t->scale = { 50.0f, 50.0f, 50.0f };
 	_entities.push_back(goofy);
 
-	const int numEnemies = 10000;
+	const int numEnemies = 100;
 	const int numRow = 10;
 	auto t0 = std::chrono::high_resolution_clock::now();
 	for (int i = 0; i < numEnemies; i++) {
@@ -152,7 +152,7 @@ bool Scene::RenderUpdate()
 		Vector3 camToEnt = Vector3Normalize(transform->translation - _camera.position);
 		Vector3 camForward = Vector3Normalize(_camera.target - _camera.position);
 		float dot = Vector3DotProduct(camToEnt, camForward);
-		if (dot < 0.0f) {
+		if (dot < cos(DEG2RAD * (_camera.fovy / 2))) {
 			continue;
 		}
 
