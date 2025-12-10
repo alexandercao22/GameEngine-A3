@@ -16,7 +16,7 @@ public:
 	virtual uint64_t GetMemoryUsage() = 0;
 
 	virtual Resource* LoadFromDisk(std::string id) = 0;
-	virtual void UnLoad() = 0;
+	virtual void Unload() = 0;
 	
 	virtual void RefAdd();
 	virtual void RefSub();

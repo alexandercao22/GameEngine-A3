@@ -1,15 +1,19 @@
 #include "Scene.h"
+#include "Settings.h"
 
 #include "imgui.h"
 #include "rlImGui.h"
+#include "raymath.h"
 
 #include "WinFileDialog.h"
+#include <chrono>
 
 #include "ResourceManager.h"
 #include "MeshResource.h"
 #include "TextureResource.h"
 
-//#define DEBUG
+#include "EntityEnemy.h"
+#include "EntityGoofy.h"
 
 bool Scene::RenderInterface()
 {
@@ -73,7 +77,7 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	_height = height;
 
 	InitWindow(_width, _height, "Game Engine Assignment 3");
-	SetTargetFPS(60);
+	//SetTargetFPS(60);
 	rlImGuiSetup(true);
 
 	Mesh floorMesh = GenMeshPlane(40, 40, 1, 1);
@@ -100,6 +104,13 @@ bool Scene::Init(unsigned int width, unsigned int height)
 		return false;
 	}
 
+	std::string texturesPkg = "Resources/Textures.gepak";
+	ResourceManager::Instance().GetPackageManager()->Pack("Resources/Textures", "Resources");
+	if (!ResourceManager::Instance().GetPackageManager()->MountPackage(texturesPkg)) {
+		std::cerr << "Scene::Init(): Could not load package: " << texturesPkg << std::endl;
+		return false;
+	}
+
 	// Initialize camera
 	_camera.position = { 0.0f, 2.0f, 10.0f };
 	_camera.target = { 0.0f, 0.0f, 0.0f };
@@ -107,21 +118,30 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	_camera.fovy = 90.0f;
 	_camera.projection = CAMERA_PERSPECTIVE;
 
-	EntityEnemy *ent = new EntityEnemy;
-	ent->Init();
-	ent->GetTransform()->translation.x = -40.0f;
-	_entities.push_back(ent);
+	EntityGoofy *goofy = new EntityGoofy;
+	goofy->Init();
+	Transform *t = goofy->GetTransform();
+	t->translation = { 0.0f, 0.0f, 100.0f };
+	t->scale = { 50.0f, 50.0f, 50.0f };
+	_entities.push_back(goofy);
 
-	ent = new EntityEnemy;
-	ent->Init();
-	ent->GetTransform()->translation.z = -40.0f;
-	_entities.push_back(ent);
+	const int numEnemies = 100;
+	const int numRow = 10;
+	auto t0 = std::chrono::high_resolution_clock::now();
+	for (int i = 0; i < numEnemies; i++) {
+		EntityEnemy *ent = new EntityEnemy;
+		ent->Init();
+		Transform *t = ent->GetTransform();
+		t->translation.x = (int)(i / numRow) * -5;
+		t->translation.z = (i % numRow) * -5;
+		_entities.push_back(ent);
+	}
+	auto t1 = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> duration = t1 - t0;
 
-	ent = new EntityEnemy;
-	ent->Init();
-	ent->GetTransform()->translation.x = -40.0f;
-	ent->GetTransform()->translation.z = -40.0f;
-	_entities.push_back(ent);
+#ifdef DEBUG
+	std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
+#endif
 
 	return true;
 }
@@ -183,9 +203,9 @@ bool Scene::RenderUpdate()
 	rlImGuiBegin();
 	BeginMode3D(_camera);
 
-	if (!RenderInterface()) {
-		return false;
-	}
+	//if (!RenderInterface()) {
+	//	return false;
+	//}
 
 	if (IsKeyPressed(KEY_C)) {
 		_showCursor = !_showCursor;
@@ -212,6 +232,15 @@ bool Scene::RenderUpdate()
 
 	for (Entity *ent : _entities) {
 		Transform *transform = ent->GetTransform();
+
+		// Frustum culling (kind of)
+		Vector3 camToEnt = Vector3Normalize(transform->translation - _camera.position);
+		Vector3 camForward = Vector3Normalize(_camera.target - _camera.position);
+		float dot = Vector3DotProduct(camToEnt, camForward);
+		if (dot < cos(DEG2RAD * (_camera.fovy / 2))) {
+			continue;
+		}
+
 		MeshResource *mesh = ent->GetMesh();
 		TextureResource *texture = ent->GetTexture();
 		if (mesh != nullptr) {
@@ -230,6 +259,7 @@ bool Scene::RenderUpdate()
 	DrawGrid(40, 1.0f);
 
 	EndMode3D();
+	DrawFPS(0, 0);
 	rlImGuiEnd();
 	EndDrawing();
 

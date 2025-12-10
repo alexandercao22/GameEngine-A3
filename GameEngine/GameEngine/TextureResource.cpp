@@ -65,7 +65,7 @@ TextureResource *TextureResource::LoadFromDisk(std::string path)
 	return this;
 }
 
-void TextureResource::UnLoad()
+void TextureResource::Unload()
 {
 	UnloadTexture(_texture);
 }

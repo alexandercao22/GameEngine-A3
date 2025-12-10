@@ -83,10 +83,9 @@ bool PackageManager::Pack(const std::string& source, const std::string& target)
 	// Table of contents (To be written at the back of the package)
 	std::vector<TOCEntry> toc;
 
-
-	if (DEBUG) {
+#ifdef DEBUG
 		std::cout << "Starting packing: " << packageName << std::endl;
-	}
+#endif
 
 	// Packaging directory
 	for (const auto& dirEntry : fs::recursive_directory_iterator(sourcePath)) {
@@ -141,9 +140,9 @@ bool PackageManager::Pack(const std::string& source, const std::string& target)
 			// Write the compressed data to the output file
 			out.write(compressedData.data.get(), compressedData.size);
 
-			if (DEBUG) {
+#ifdef DEBUG
 				std::cout << "Packed " << key << " (" << uncompressedData.size << " -> " << compressedData.size << " bytes)" << std::endl;
-			}
+#endif
 		}
 	}
 
@@ -171,9 +170,9 @@ bool PackageManager::Pack(const std::string& source, const std::string& target)
 	out.seekp(0);
 	out.write(reinterpret_cast<char*>(&header), sizeof(header));
 
-	if (DEBUG) {
+#ifdef DEBUG
 		std::cout << "Finished packing: " << packageName << std::endl;
-	}
+#endif
 
 	return true;
 }
@@ -243,9 +242,9 @@ bool PackageManager::Unpack(const std::string& source, const std::string& target
 	}
 	fs::create_directory(targetPath);
 
-	if (DEBUG) {
+#ifdef DEBUG
 		std::cout << "Starting unpacking: " << sourcePath.filename().string() << std::endl;
-	}
+#endif
 
 	// Go through all entries and restore the files
 	for (auto& entry : toc) {
@@ -286,9 +285,9 @@ bool PackageManager::Unpack(const std::string& source, const std::string& target
 		std::ofstream out(filePath, std::ios::binary);
 		out.write(uncompressedData.data.get(), uncompressedData.size);
 
-		if (DEBUG) {
+#ifdef DEBUG
 			std::cout << "Unpacked " << entry.key << " (" << compressedData.size << " -> " << uncompressedData.size << " bytes)" << std::endl;
-		}
+#endif
 
 		if (!GuidUtils::CreateMetaFileFromGuid(filePath, entry.guid)) {
 			std::cerr << "PackageManager::Unpack(): Could not create meta file for " << entry.key << std::endl;
@@ -372,9 +371,9 @@ bool PackageManager::MountPackage(const std::string& source)
 		_mountOrder.push_back(packageKey);
 	}
 
-	if (DEBUG) {
+#ifdef DEBUG
 		std::cout << "Mounted package: |" << packageKey << "| with priority: " << _mountOrder.size() << std::endl;
-	}
+#endif
 
 	return true;
 }
@@ -402,9 +401,9 @@ bool PackageManager::UnmountPackage()
 	// Removing the mounted package key from mounting order
 	_mountOrder.pop_back();
 
-	if (DEBUG) {
+#ifdef DEBUG
 		std::cout << "Unmounted package: " << packageKey << std::endl;
-	}
+#endif
 
 	return true;
 }
@@ -426,9 +425,9 @@ bool PackageManager::UnmountPackage(const std::string& packageKey)
 	auto newEnd = std::remove(_mountOrder.begin(), _mountOrder.end(), packageKey);
 	_mountOrder.erase(newEnd, _mountOrder.end());
 
-	if (DEBUG) {
+#ifdef DEBUG
 		std::cout << "Unmounted package: " << packageKey << std::endl;
-	}
+#endif
 
 	return true;
 }
@@ -445,9 +444,9 @@ bool PackageManager::UnmountAllPackages()
 	_mountedPackages.clear();
 	_mountOrder.clear();
 
-	if (DEBUG) {
+#ifdef DEBUG
 		std::cout << "Unmounted all packages" << std::endl;
-	}
+#endif
 
 	return true;
 }
@@ -469,9 +468,9 @@ bool PackageManager::LoadAssetByGuid(const std::string& guid, AssetData& asset)
 				return false;
 			}
 
-			if (DEBUG) {
+#ifdef DEBUG
 				std::cout << "Loaded asset with GUID: |" << guid << "| From package: " << packageKey << std::endl;
-			}
+#endif
 			return true;
 		}
 	}
@@ -497,9 +496,9 @@ bool PackageManager::LoadAssetByKey(const std::string& key, AssetData& asset)
 				return false;
 			}
 
-			if (DEBUG) {
-				std::cout << "Loaded asset with key: |" << key << "| From package: " << packageKey << std::endl;
-			}
+#ifdef DEBUG
+				std::cout << "Loaded asset with path: |" << path << "| From package: " << packageKey << std::endl;
+#endif
 			return true;
 		}
 	}

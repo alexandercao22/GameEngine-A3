@@ -6,6 +6,8 @@ ResourceManager::ResourceManager() {
 	workerThread.back().detach();
 }
 
+#include "GuidUtils.h"
+
 ResourceManager::~ResourceManager() {
 	
 	for (auto pair : _cachedResources) {
@@ -14,6 +16,11 @@ ResourceManager::~ResourceManager() {
 }
 
 bool ResourceManager::LoadResource(std::string guid, Resource *&resource) {
+	if (guid.length() != GUID_STR_LENGTH) {
+		std::cerr << "ResourceManager::LoadResource(): GUID is invalid" << std::endl;
+		return false;
+	}
+
 	auto pair = _cachedResources.find(guid);
 	if (pair != _cachedResources.end()) {
 		// Resource already exists in cache
@@ -57,7 +64,7 @@ bool ResourceManager::UnloadResource(std::string guid) {
 	if (ref == 1) {
 		// References goes to 0 -> remove resource from cache
 		_memoryUsed -= _cachedResources[guid]->GetMemoryUsage();
-		_cachedResources[guid]->UnLoad();
+		_cachedResources[guid]->Unload();
 		_cachedResources.erase(guid);
 		return true;
 	}
