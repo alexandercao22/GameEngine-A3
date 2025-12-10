@@ -507,11 +507,6 @@ bool PackageManager::LoadAssetByKey(const std::string& key, AssetData& asset)
 	return false;
 }
 
-//MountedPackage PackageManager::GetMountedPackage() {
-//	std::string key = _mountOrder.back();
-//	return _mountedPackages[key];
-//}
-
 std::vector<std::string> PackageManager::GetGUIDsInPackage(const std::string& packageKey)
 {
 	std::vector<std::string> guids;
