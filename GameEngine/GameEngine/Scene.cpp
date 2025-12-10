@@ -14,6 +14,7 @@
 
 #include "EntityEnemy.h"
 #include "EntityGoofy.h"
+#include "EntityMushroom.h"
 
 bool Scene::RenderInterface()
 {
@@ -193,6 +194,62 @@ bool Scene::Update()
 			Transform *t = ent->GetTransform();
 			t->translation.x = (int)(i / numRow) * -5;
 			t->translation.z = (i % numRow) * -5;
+			_entities.push_back(ent);
+		}
+		auto t1 = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> duration = t1 - t0;
+
+#ifdef DEBUG
+		std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
+#endif
+	}
+
+	// GREEN part
+	static bool greenHasLoaded = false;
+	if (_parts.size() > 1 && !greenHasLoaded &&
+		_parts[1]->CheckDistance(_camera.position) && _parts[1]->IsLoaded()) {
+		greenHasLoaded = true;
+		int numEnemies = 100;
+#ifdef TEST
+		numEnemies = 10000;
+#endif
+		const int numRow = 10;
+		auto t0 = std::chrono::high_resolution_clock::now();
+		for (int i = 0; i < numEnemies; i++) {
+			EntityGoofy *ent = new EntityGoofy;
+			ent->Init();
+			Transform *t = ent->GetTransform();
+			t->translation.x = (int)(i / numRow) * -20;
+			t->translation.y = 10.0f;
+			t->translation.z = (i % numRow) * -10;
+			t->scale = { 10.0f, 10.0f, 10.0f };
+			_entities.push_back(ent);
+		}
+		auto t1 = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> duration = t1 - t0;
+
+#ifdef DEBUG
+		std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
+#endif
+	}
+
+	// RED part
+	static bool redHasLoaded = false;
+	if (_parts.size() > 2 && !redHasLoaded &&
+		_parts[2]->CheckDistance(_camera.position) && _parts[2]->IsLoaded()) {
+		redHasLoaded = true;
+		int numEnemies = 100;
+#ifdef TEST
+		numEnemies = 10000;
+#endif
+		const int numRow = 10;
+		auto t0 = std::chrono::high_resolution_clock::now();
+		for (int i = 0; i < numEnemies; i++) {
+			EntityMushroom *ent = new EntityMushroom;
+			ent->Init();
+			Transform *t = ent->GetTransform();
+			t->translation.x = (int)(i / numRow) * -2;
+			t->translation.z = (i % numRow) * -2;
 			_entities.push_back(ent);
 		}
 		auto t1 = std::chrono::high_resolution_clock::now();
