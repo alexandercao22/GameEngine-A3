@@ -1,12 +1,11 @@
 #include "ResourceManager.h"
-//#define TEST
+#include "GuidUtils.h"
+
 ResourceManager::ResourceManager() {
 	workerThread.emplace_back(&ResourceManager::WorkerThread, this);
 
 	workerThread.back().detach();
 }
-
-#include "GuidUtils.h"
 
 ResourceManager::~ResourceManager() {
 	
