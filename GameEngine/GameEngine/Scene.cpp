@@ -9,6 +9,8 @@
 #include "MeshResource.h"
 #include "TextureResource.h"
 
+//#define DEBUG
+
 bool Scene::RenderInterface()
 {
 	ImGui::Begin("ImGui");
@@ -37,7 +39,21 @@ bool Scene::RenderInterface()
 		std::string path = "Resource/" + std::string(buf);
 		//ResourceManager::Instance().SaveGUID(path);
 	}
+	ImGui::Separator();
+	ImGui::Text("Camera Position:");
+	ImGui::BulletText("X: %.2f", _camera.position.x);
+	ImGui::BulletText("Y: %.2f", _camera.position.y);
+	ImGui::BulletText("Z: %.2f", _camera.position.z);
+	ImGui::Text("Distance: %s", _test.c_str());
+	ImGui::Separator();
+	ImGui::Text("CachedResources:", _test.c_str());
 
+	std::vector<std::string> resources = ResourceManager::Instance().GetCachedResources();
+	for (int i = 0; i < resources.size(); i++) {
+		ImGui::Text("%s", resources[i].c_str());
+
+	}
+	
 	ImGui::End();
 	return true;
 }
@@ -46,6 +62,10 @@ Scene::~Scene()
 {
 	for (Entity *ent : _entities) {
 		delete ent;
+	}
+
+	for (ScenePart* part : _parts) {
+		delete part;
 	}
 
 	ResourceManager::Instance().GetPackageManager()->UnmountAllPackages();
@@ -60,6 +80,34 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	SetTargetFPS(60);
 	rlImGuiSetup(true);
 
+	Mesh floorMesh = GenMeshPlane(40, 40, 1, 1);
+	_floor = LoadModelFromMesh(floorMesh);
+
+
+	
+		//Initialize the parts
+
+		/*ScenePart part1;
+		part1.Init({0,0,0}, "Resources/Mesh.gepak");
+		_parts.push_back(part1);*/
+
+		ScenePart* part2 = new ScenePart;
+		part2->Init({-40,0,0}, "Resources/niva1.gepak");
+		_parts.push_back(part2);
+
+		ScenePart* part3 = new ScenePart;
+		part3->Init({0,0,-40}, "Resources/Mesh.gepak");
+		_parts.push_back(part3);
+
+		ScenePart* part4 = new ScenePart;
+		part4->Init({-40,0,-40}, "Resources/Mesh.gepak");
+		_parts.push_back(part4);
+
+	/*	ResourceManager::Instance().GetPackageManager()->MountPackage(part1.GetPath()) {
+			std::cerr << blablabla << std::endl;
+		}
+	*/
+
 	std::string packagePath = "Resources/Mesh.gepak";
 	if (!ResourceManager::Instance().GetPackageManager()->MountPackage(packagePath)) {
 		std::cerr << "Scene::Init(): Could not load package: " << packagePath << std::endl;
@@ -67,7 +115,7 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	}
 
 	// Initialize camera
-	_camera.position = { 0.0f, 5.0f, 10.0f };
+	_camera.position = { 0.0f, 2.0f, 10.0f };
 	_camera.target = { 0.0f, 0.0f, 0.0f };
 	_camera.up = { 0.0f, 1.0f, 0.0f };
 	_camera.fovy = 90.0f;
@@ -75,19 +123,19 @@ bool Scene::Init(unsigned int width, unsigned int height)
 
 	EntityEnemy *ent = new EntityEnemy;
 	ent->Init();
-	ent->GetTransform()->translation.x = 4.0f;
+	ent->GetTransform()->translation.x = -40.0f;
 	_entities.push_back(ent);
 
 	ent = new EntityEnemy;
 	ent->Init();
-	ent->GetTransform()->translation.y = 4.0f;
+	ent->GetTransform()->translation.z = -40.0f;
 	_entities.push_back(ent);
 
 	ent = new EntityEnemy;
 	ent->Init();
-	ent->GetTransform()->translation.x = 4.0f;
-	ent->GetTransform()->translation.y = 4.0f;
-	ent->GetTransform()->translation.z = 4.0f;
+	ent->GetTransform()->translation.x = -40.0f;
+	//ent->GetTransform()->translation.y = 4.0f;
+	ent->GetTransform()->translation.z = -40.0f;
 	_entities.push_back(ent);
 
 	return true;
@@ -95,6 +143,54 @@ bool Scene::Init(unsigned int width, unsigned int height)
 
 bool Scene::Update()
 {
+	/* 
+		Check distance between parts
+		if distance is appropiate add the work to the thread vector
+		so it can see it has work to do.
+		Add the data from the thread onto the the RM queue.
+
+		Check if the RM queue is empty. If not, load the model/texture
+		with the data. 
+
+
+	*/
+
+	static bool mouseLocked = false;
+	if (IsKeyPressed(KEY_V))
+	{
+		mouseLocked = !mouseLocked;
+
+		if (mouseLocked)
+			DisableCursor();
+		else
+			EnableCursor();
+	}
+	int size = ResourceManager::Instance().GetThreadDataSize();
+#ifdef DEBUG
+	std::cout << size << std::endl;
+#endif
+	if ( size > 0) {
+		// Load the model or texture from the data in ThreadData datastructure
+		// All this complexity would not be necessary if we did not use Raylib
+		Resource* res = new MeshResource;
+		ResourceManager::Instance().LoadObject(res);
+	}
+
+	for (auto& part : _parts) {
+		
+
+		if (part->CheckDistance(_camera.position)) {
+			if (!part->IsLoaded()) {
+				// Load
+				_test = "What are you doin heare?";
+				std::string path = part->GetPath();
+				ResourceManager::Instance().AddPackage(path);
+
+			}
+		}
+	}
+
+	UpdateCamera(&_camera, CAMERA_FREE);
 	return true;
 }
 
@@ -122,6 +218,15 @@ bool Scene::RenderUpdate()
 	if (!_showCursor) {
 		UpdateCamera(&_camera, CAMERA_FREE);
 	}
+	Color colors[4] = { GREEN, DARKGREEN, LIME, BROWN };
+
+	int j = 0;
+	for (int i = 0; i < 2; i++) {
+		for (int k = 0; k < 2; k++) {
+			DrawModel(_floor, Vector3{ -40.0f + k * 40, 0, -40.0f + i * 40 }, 1.0f, colors[j]);
+			j++;
+		}
+	}
 
 	for (Entity *ent : _entities) {
 		Transform *transform = ent->GetTransform();
@@ -140,7 +245,7 @@ bool Scene::RenderUpdate()
 		}
 	}
 
-	DrawGrid(20, 1.0f);
+	DrawGrid(40, 1.0f);
 
 	EndMode3D();
 	rlImGuiEnd();

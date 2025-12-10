@@ -147,6 +147,7 @@
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="rlImGui.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="ScenePart.cpp" />
     <ClCompile Include="StackAllocator.cpp" />
     <ClCompile Include="TestCases.cpp" />
     <ClCompile Include="TextureResource.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="ScenePart.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="StackAllocator.h" />
     <ClInclude Include="TestCases.h" />

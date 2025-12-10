@@ -93,6 +93,9 @@
     <ClCompile Include="EntityEnemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ScenePart.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Objects.h">
@@ -149,8 +152,8 @@
     <ClInclude Include="GuidUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OBJ_Loader.h">
-      <Filter>Header Files\Engine</Filter>
+    <ClInclude Include="ScenePart.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -76,4 +76,10 @@ public:
 	bool LoadAssetByGuid(const std::string& guid, AssetData& asset);
 	// Loads asset specified by key (path relative to the package that holds it)
 	bool LoadAssetByKey(const std::string& key, AssetData& asset);
+
+
+	// Get the thread loaded package to load all resources
+	//MountedPackage GetMountedPackage();
+	std::vector<std::string> GetGUIDsInPackage(const std::string& packageKey);
+	std::vector<std::string> GetGUIDsInLastMountedPackage();
 };
