@@ -497,7 +497,7 @@ bool PackageManager::LoadAssetByKey(const std::string& key, AssetData& asset)
 			}
 
 #ifdef DEBUG
-				std::cout << "Loaded asset with path: |" << path << "| From package: " << packageKey << std::endl;
+				std::cout << "Loaded asset with key: |" << key << "| From package: " << packageKey << std::endl;
 #endif
 			return true;
 		}
