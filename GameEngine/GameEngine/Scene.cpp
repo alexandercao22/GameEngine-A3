@@ -160,29 +160,28 @@ bool Scene::Update()
 //#ifdef DEBUG
 //	std::cout << "ThreadDataSize: " << size << std::endl;
 //#endif
-	if ( size > 0) {
-		// Load the model or texture from the data in ThreadData datastructure
-		// All this complexity would not be necessary if we did not use Raylib
-		Resource* res = new MeshResource;
-		ResourceManager::Instance().LoadObject(res);
-	}
+	//if ( size > 0) {
+	//	// Load the model or texture from the data in ThreadData datastructure
+	//	// All this complexity would not be necessary if we did not use Raylib
+	//	Resource* res = new MeshResource;
+	//	ResourceManager::Instance().LoadObject(res);
+	//}
 
-	for (auto& part : _parts) {
-		if (part->CheckDistance(_camera.position)) {
-			if (!part->IsLoaded()) {
-				// Load
-				std::string path = part->GetPath();
-				ResourceManager::Instance().AddPackage(path);
-			}
-		}
-	}
+	//for (auto& part : _parts) {
+	//	if (part->CheckDistance(_camera.position)) {
+	//		if (!part->IsLoaded()) {
+	//			// Load
+	//			std::string path = part->GetPath();
+	//			ResourceManager::Instance().AddPackage(path);
+	//		}
+	//	}
+	//}
 
 	// BLUE part
-	static bool blueHasLoaded = false;
-	if (_parts.size() > 0 && !blueHasLoaded &&
-		_parts[0]->CheckDistance(_camera.position) && _parts[0]->IsLoaded()) {
-		blueHasLoaded = true;
+	if (_parts.size() > 0 &&
+		_parts[0]->CheckDistance(_camera.position) && !_parts[0]->IsLoaded()) {
 		int numEnemies = 100;
+		ResourceManager::Instance().AddPackage(_parts[0]->GetPath());
 #ifdef TEST
 		numEnemies = 10000;
 #endif
@@ -205,11 +204,10 @@ bool Scene::Update()
 	}
 
 	// GREEN part
-	static bool greenHasLoaded = false;
-	if (_parts.size() > 1 && !greenHasLoaded &&
-		_parts[1]->CheckDistance(_camera.position) && _parts[1]->IsLoaded()) {
-		greenHasLoaded = true;
+	if (_parts.size() > 1 &&
+		_parts[1]->CheckDistance(_camera.position) && !_parts[1]->IsLoaded()) {
 		int numEnemies = 100;
+		ResourceManager::Instance().AddPackage(_parts[1]->GetPath());
 #ifdef TEST
 		numEnemies = 10000;
 #endif
@@ -234,11 +232,10 @@ bool Scene::Update()
 	}
 
 	// RED part
-	static bool redHasLoaded = false;
-	if (_parts.size() > 2 && !redHasLoaded &&
-		_parts[2]->CheckDistance(_camera.position) && _parts[2]->IsLoaded()) {
-		redHasLoaded = true;
+	if (_parts.size() > 2 &&
+		_parts[2]->CheckDistance(_camera.position) && !_parts[2]->IsLoaded()) {
 		int numEnemies = 100;
+		ResourceManager::Instance().AddPackage(_parts[0]->GetPath());
 #ifdef TEST
 		numEnemies = 10000;
 #endif
