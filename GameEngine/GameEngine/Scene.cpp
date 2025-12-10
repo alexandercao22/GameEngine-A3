@@ -294,7 +294,7 @@ bool Scene::RenderUpdate()
 		Vector3 camToEnt = Vector3Normalize(transform->translation - _camera.position);
 		Vector3 camForward = Vector3Normalize(_camera.target - _camera.position);
 		float dot = Vector3DotProduct(camToEnt, camForward);
-		if (dot < cos(DEG2RAD * (_camera.fovy / 2))) {
+		if (dot < cos((_camera.fovy / 2))) {
 			continue;
 		}
 
