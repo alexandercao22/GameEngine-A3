@@ -3,6 +3,7 @@
 
 #include "imgui.h"
 #include "rlImGui.h"
+#include "raymath.h"
 
 #include "WinFileDialog.h"
 #include <chrono>
@@ -62,7 +63,7 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	_height = height;
 
 	InitWindow(_width, _height, "Game Engine Assignment 3");
-	SetTargetFPS(60);
+	//SetTargetFPS(60);
 	rlImGuiSetup(true);
 
 	std::string meshesPkg = "Resources/Meshes.gepak";
@@ -146,6 +147,15 @@ bool Scene::RenderUpdate()
 
 	for (Entity *ent : _entities) {
 		Transform *transform = ent->GetTransform();
+
+		// Frustum culling (kind of)
+		Vector3 camToEnt = Vector3Normalize(transform->translation - _camera.position);
+		Vector3 camForward = Vector3Normalize(_camera.target - _camera.position);
+		float dot = Vector3DotProduct(camToEnt, camForward);
+		if (dot < 0.0f) {
+			continue;
+		}
+
 		MeshResource *mesh = ent->GetMesh();
 		TextureResource *texture = ent->GetTexture();
 		if (mesh != nullptr) {
@@ -164,6 +174,7 @@ bool Scene::RenderUpdate()
 	DrawGrid(20, 1.0f);
 
 	EndMode3D();
+	DrawFPS(0, 0);
 	rlImGuiEnd();
 	EndDrawing();
 
