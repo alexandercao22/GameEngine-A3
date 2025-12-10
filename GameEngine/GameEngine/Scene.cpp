@@ -84,19 +84,19 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	_floor = LoadModelFromMesh(floorMesh);
 
 	//Initialize the parts
-	ScenePart* part2 = new ScenePart;
+	ScenePart* part2 = new ScenePart; // BLUE
 	part2->Init({-40,0,0}, "Resources/niva1.gepak");
 	_parts.push_back(part2);
 
-	ScenePart* part3 = new ScenePart;
-	part3->Init({0,0,-40}, "Resources/Mesh.gepak");
+	ScenePart* part3 = new ScenePart; // GREEN
+	part3->Init({0,0,-40}, "Resources/Meshes.gepak");
 	_parts.push_back(part3);
 
-	ScenePart* part4 = new ScenePart;
-	part4->Init({-40,0,-40}, "Resources/Mesh.gepak");
+	ScenePart* part4 = new ScenePart; // RED
+	part4->Init({-40,0,-40}, "Resources/Meshes.gepak");
 	_parts.push_back(part4);
 
-	std::string packagePath = "Resources/Mesh.gepak";
+	std::string packagePath = "Resources/Meshes.gepak";
 	if (!ResourceManager::Instance().GetPackageManager()->MountPackage(packagePath)) {
 		std::cerr << "Scene::Init(): Could not load package: " << packagePath << std::endl;
 		return false;
@@ -211,7 +211,7 @@ bool Scene::RenderUpdate()
 	//	return false;
 	//}
 
-	Color colors[4] = { GREEN, DARKGREEN, LIME, BROWN };
+	Color colors[4] = { RED, GREEN, BLUE, YELLOW };
 	int j = 0;
 	for (int i = 0; i < 2; i++) {
 		for (int k = 0; k < 2; k++) {
