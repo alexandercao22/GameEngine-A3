@@ -200,7 +200,7 @@ bool Scene::Update()
 		std::chrono::duration<double> duration = t1 - t0;
 
 #ifdef DEBUG
-		std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
+		std::cout << "Time to load " << numEnemies << " EntityEnemy (BLUE): " << duration.count() << "s" << std::endl;
 #endif
 	}
 
@@ -229,7 +229,7 @@ bool Scene::Update()
 		std::chrono::duration<double> duration = t1 - t0;
 
 #ifdef DEBUG
-		std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
+		std::cout << "Time to load " << numEnemies << " EntityGoofy (GREEN): " << duration.count() << "s" << std::endl;
 #endif
 	}
 
@@ -256,7 +256,7 @@ bool Scene::Update()
 		std::chrono::duration<double> duration = t1 - t0;
 
 #ifdef DEBUG
-		std::cout << "Time to load " << numEnemies << " EntityEnemy: " << duration.count() << "s" << std::endl;
+		std::cout << "Time to load " << numEnemies << " EntityMushroom (RED): " << duration.count() << "s" << std::endl;
 #endif
 	}
 
