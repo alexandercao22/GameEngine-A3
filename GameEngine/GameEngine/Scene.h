@@ -19,7 +19,7 @@ private:
 	std::string _test = "hej";
 	
 	// The parts hold a package to a "lvl" and a distance. When distance is appropiate run async loading
-	std::vector<ScenePart> _parts;
+	std::vector<ScenePart*> _parts;
 
 	Camera3D _camera = { 0 };
 	bool _showCursor = true;

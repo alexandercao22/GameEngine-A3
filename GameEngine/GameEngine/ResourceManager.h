@@ -9,6 +9,7 @@
 #include "Resource.h"
 #include "PackageManager.h"
 #include <thread>
+#include <chrono>
 
 class ResourceManager 
 {

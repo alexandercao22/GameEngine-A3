@@ -64,6 +64,10 @@ Scene::~Scene()
 		delete ent;
 	}
 
+	for (ScenePart* part : _parts) {
+		delete part;
+	}
+
 	ResourceManager::Instance().GetPackageManager()->UnmountAllPackages();
 }
 
@@ -87,16 +91,16 @@ bool Scene::Init(unsigned int width, unsigned int height)
 		part1.Init({0,0,0}, "Resources/Mesh.gepak");
 		_parts.push_back(part1);*/
 
-		ScenePart part2;
-		part2.Init({-40,0,0}, "Resources/niva1/niva1.gepak");
+		ScenePart* part2 = new ScenePart;
+		part2->Init({-40,0,0}, "Resources/niva1.gepak");
 		_parts.push_back(part2);
 
-		ScenePart part3;
-		part3.Init({0,0,-40}, "Resources/Mesh.gepak");
+		ScenePart* part3 = new ScenePart;
+		part3->Init({0,0,-40}, "Resources/Mesh.gepak");
 		_parts.push_back(part3);
 
-		ScenePart part4;
-		part4.Init({-40,0,-40}, "Resources/Mesh.gepak");
+		ScenePart* part4 = new ScenePart;
+		part4->Init({-40,0,-40}, "Resources/Mesh.gepak");
 		_parts.push_back(part4);
 
 	/*	ResourceManager::Instance().GetPackageManager()->MountPackage(part1.GetPath()) {
@@ -172,14 +176,14 @@ bool Scene::Update()
 		ResourceManager::Instance().LoadObject(res);
 	}
 
-	for (auto part : _parts) {
+	for (auto& part : _parts) {
 		
 
-		if (part.CheckDistance(_camera.position)) {
-			if (!part.IsLoaded()) {
+		if (part->CheckDistance(_camera.position)) {
+			if (!part->IsLoaded()) {
 				// Load
 				_test = "What are you doin heare?";
-				std::string path = part.GetPath();
+				std::string path = part->GetPath();
 				ResourceManager::Instance().AddPackage(path);
 
 			}

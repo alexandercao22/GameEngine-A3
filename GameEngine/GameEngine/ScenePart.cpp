@@ -11,7 +11,8 @@ bool ScenePart::Init(Vector3 pos, std::string path) {
 }
 
 std::string ScenePart::GetPath() {
-	_loaded = true;
+	//_loaded = true;
+	SetLoaded(true);
 	return _pathToPackage;
 }
 
@@ -23,5 +24,9 @@ bool ScenePart::CheckDistance(Vector3 camera) {
 }
 
 bool ScenePart::IsLoaded() {
-	return _loaded;
+	return _loaded.load();
+}
+
+void ScenePart::SetLoaded(bool val) {
+	_loaded.store(val);
 }

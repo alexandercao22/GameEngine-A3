@@ -1,10 +1,13 @@
 #include "ResourceManager.h"
+//#define TEST
 ResourceManager::ResourceManager() {
 	workerThread.emplace_back(&ResourceManager::WorkerThread, this);
+
+	workerThread.back().detach();
 }
 
 ResourceManager::~ResourceManager() {
-	workerThread.at(0).join();
+	
 	for (auto pair : _cachedResources) {
 		delete pair.second;
 	}
@@ -119,8 +122,10 @@ void ResourceManager::WorkerThread() {
 			_newPackage.erase(_newPackage.begin());
 		}
 		//if (!_newPackage.empty()) {
-
-			if (!_packageManager.MountPackage(package)) {
+#ifdef TEST
+		auto t0 = std::chrono::high_resolution_clock::now();
+#endif		
+		if (!_packageManager.MountPackage(package)) {
 				std::cerr << "ResourceManager::MountPackage(): Could not mount package" << std::endl;
 			}
 			//MountedPackage pack = _packageManager.GetMountedPackage();
@@ -139,10 +144,11 @@ void ResourceManager::WorkerThread() {
 				_threadData.emplace(guid, std::move(data));
 				
 			}
-			//std::lock_guard<std::mutex> lock(_threadDataMutex);
-
-			//_newPackage.erase(_newPackage.begin());
-		//}
+#ifdef TEST
+		auto t1 = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> duration = t1 - t0;
+		std::cout << "Mounting Package and reading data: " << duration.count() << std::endl;
+#endif
 	}
 }
 
@@ -152,7 +158,11 @@ int ResourceManager::GetThreadDataSize() {
 
 bool ResourceManager::LoadObject(Resource* &resource) {
 	//std::mutex _threadDataMutex;
+#ifdef TEST
+	auto t0 = std::chrono::high_resolution_clock::now();
+#endif
 	AssetData data;
+	std::string guid;
 	{
 
 		std::lock_guard<std::mutex> lock(_threadDataMutex);
@@ -163,12 +173,18 @@ bool ResourceManager::LoadObject(Resource* &resource) {
 		
 		auto it = _threadData.begin();
 		data = std::move(it->second);
+		guid = std::move(it->first);
 		_threadData.erase(it);
 	
 	}
 	std::string text(data.data.get(), data.size);
 	resource->LoadFromData(text.data(), text.size());
-
+	_cachedResources.emplace(guid, resource);
+#ifdef TEST
+	auto t1 = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> duration = t1 - t0;
+	std::cout << "Loading resouce from data: " << duration.count() << std::endl;
+#endif
 	return true;
 	
 }
