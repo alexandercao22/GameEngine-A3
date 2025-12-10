@@ -33,7 +33,7 @@ struct TOCEntry {
 // Supports lookup by GUID and by path
 struct MountedPackage {
 	std::string path; // Path to the mounted package
-	std::unordered_map<std::string, TOCEntry> tocByPath; // Key (string): name of the file inside the package (file.extension)
+	std::unordered_map<std::string, TOCEntry> tocByKey; // Key (string): name of the file inside the package (file.extension)
 	std::unordered_map<std::string, TOCEntry> tocByGuid; // Key (string): GUID of the asset found in its .meta file (file.extension.meta)
 };
 
@@ -74,6 +74,6 @@ public:
 
 	// Loads asset specified by GUID
 	bool LoadAssetByGuid(const std::string& guid, AssetData& asset);
-	// Loads asset specified by path relative to the package that holds it
-	bool LoadAssetByPath(const std::string& path, AssetData& asset);
+	// Loads asset specified by key (path relative to the package that holds it)
+	bool LoadAssetByKey(const std::string& key, AssetData& asset);
 };

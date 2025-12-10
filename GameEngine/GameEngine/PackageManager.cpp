@@ -358,7 +358,7 @@ bool PackageManager::MountPackage(const std::string& source)
 		entry.guid = guid;
 		entry.key = key;
 
-		mountedPackage.tocByPath.emplace(key, entry);
+		mountedPackage.tocByKey.emplace(key, entry);
 		mountedPackage.tocByGuid.emplace(guid, entry);
 	}
 
@@ -480,7 +480,7 @@ bool PackageManager::LoadAssetByGuid(const std::string& guid, AssetData& asset)
 	return false;
 }
 
-bool PackageManager::LoadAssetByPath(const std::string& path, AssetData& asset)
+bool PackageManager::LoadAssetByKey(const std::string& key, AssetData& asset)
 {	
 	// Locks write operations to mount containers (thread safety)
 	std::shared_lock<std::shared_mutex> mountLock(_mountMutex);
@@ -489,21 +489,21 @@ bool PackageManager::LoadAssetByPath(const std::string& path, AssetData& asset)
 		std::string packageKey = _mountOrder.at(i - 1);
 
 		MountedPackage& mountedPackage = _mountedPackages.find(packageKey)->second;
-		auto pair = mountedPackage.tocByPath.find(path);
-		if (pair != mountedPackage.tocByPath.end()) {
+		auto pair = mountedPackage.tocByKey.find(key);
+		if (pair != mountedPackage.tocByKey.end()) {
 			// Asset found -> load it
 			if (!LoadAsset(mountedPackage, pair->second, asset)) {
-				std::cerr << "PackageManager::LoadAssetByPath(): Unable to load asset" << std::endl;
+				std::cerr << "PackageManager::LoadAssetByKey(): Unable to load asset" << std::endl;
 				return false;
 			}
 
 			if (DEBUG) {
-				std::cout << "Loaded asset with path: |" << path << "| From package: " << packageKey << std::endl;
+				std::cout << "Loaded asset with key: |" << key << "| From package: " << packageKey << std::endl;
 			}
 			return true;
 		}
 	}
 
-	std::cerr << "PackageManager::LoadAssetByPath(): Asset does not exist within a mounted package" << std::endl;
+	std::cerr << "PackageManager::LoadAssetByKey(): Asset does not exist within a mounted package" << std::endl;
 	return false;
 }
