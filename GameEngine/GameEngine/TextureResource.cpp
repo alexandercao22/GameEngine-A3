@@ -25,14 +25,12 @@ bool TextureResource::LoadFromData(const char* data, size_t size, const std::str
 	}
 
 	Image image = LoadImageFromMemory(fileExtension.c_str(), (const unsigned char*)data, size);
-
-	if (image.data == nullptr) {
+	if (!IsImageValid(image)) {
 		std::cerr << "TextureResource::LoadFromData(): Failed to load image from data" << std::endl;
 		return false;
 	}
 
 	_texture = LoadTextureFromImage(image);
-
 	if (!IsTextureValid(_texture)) {
 		std::cerr << "TextureResource::LoadFromData(): Failed to load texture from image" << std::endl;
 		return false;
