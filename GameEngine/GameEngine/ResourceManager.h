@@ -8,6 +8,7 @@
 #include <iostream>
 #include "Resource.h"
 #include "PackageManager.h"
+#include <thread>
 
 class ResourceManager 
 {
@@ -17,8 +18,10 @@ private:
 	uint64_t _memoryUsed;
 
 	std::vector<std::string> _newPackage;
-	std::thread workerThread[1];
+	std::vector<std::thread> workerThread;
 	std::unordered_map<std::string, AssetData> _threadData;
+	std::mutex _packageMutex;
+	std::mutex _threadDataMutex;
 
 	
 	PackageManager _packageManager; // Manages packages and resource loading from packages
@@ -34,12 +37,14 @@ public:
 	ResourceManager(const ResourceManager &) = delete;
 	ResourceManager &operator=(const ResourceManager &) = delete;
 
-	ResourceManager() = default;
+	//ResourceManager() = default;
+	ResourceManager();
 	~ResourceManager();
 
 	bool LoadResource(std::string guid, Resource *&resource);
 	bool UnloadResource(std::string guid);
 	bool LoadObject(Resource* &resource);
+	bool AddPackage(std::string path);
 
 	void WorkerThread();
 	int GetThreadDataSize();
@@ -57,4 +62,7 @@ public:
 
 	// Gets memory used (in bytes)
 	uint64_t GetMemoryUsed();
+
+	// Get cached resources
+	std::vector<std::string> GetCachedResources();
 };

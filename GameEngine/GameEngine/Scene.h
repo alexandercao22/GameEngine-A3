@@ -14,6 +14,9 @@ private:
 	std::vector<std::string> _GUIDs; // GUIDs needed for this specific scene
 
 	std::vector<Entity *> _entities;
+
+	Model _floor;
+	std::string _test = "hej";
 	
 	// The parts hold a package to a "lvl" and a distance. When distance is appropiate run async loading
 	std::vector<ScenePart> _parts;

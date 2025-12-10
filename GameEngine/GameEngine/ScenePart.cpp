@@ -1,12 +1,27 @@
 #include "ScenePart.h"
+#include <math.h>
 
-bool ScenePart::Init(float pos[3], std::string path) {
-	_centerPos[0] = pos[0];
-	_centerPos[1] = pos[1];
-	_centerPos[2] = pos[2];
+bool ScenePart::Init(Vector3 pos, std::string path) {
+	_centerPos.x = pos.x;
+	_centerPos.y = pos.y;
+	_centerPos.z = pos.z;
 	_pathToPackage = path;
+
+	return true;
 }
 
 std::string ScenePart::GetPath() {
+	_loaded = true;
 	return _pathToPackage;
+}
+
+bool ScenePart::CheckDistance(Vector3 camera) {
+	if (abs(_centerPos.x - camera.x) < 20 && abs(_centerPos.z - camera.z) < 20){
+		return true;
+	}
+	return false;
+}
+
+bool ScenePart::IsLoaded() {
+	return _loaded;
 }
