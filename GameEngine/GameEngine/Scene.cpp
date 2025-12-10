@@ -11,6 +11,9 @@
 #include "MeshResource.h"
 #include "TextureResource.h"
 
+#include "EntityEnemy.h"
+#include "EntityGoofy.h"
+
 bool Scene::RenderInterface()
 {
 	ImGui::Begin("ImGui");
@@ -82,6 +85,13 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	_camera.up = { 0.0f, 1.0f, 0.0f };
 	_camera.fovy = 90.0f;
 	_camera.projection = CAMERA_PERSPECTIVE;
+
+	EntityGoofy *goofy = new EntityGoofy;
+	goofy->Init();
+	Transform *t = goofy->GetTransform();
+	t->translation = { 0.0f, 0.0f, 100.0f };
+	t->scale = { 50.0f, 50.0f, 50.0f };
+	_entities.push_back(goofy);
 
 	const int numEnemies = 10000;
 	const int numRow = 10;
