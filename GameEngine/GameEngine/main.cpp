@@ -15,11 +15,6 @@ int main() {
 	Scene scene;
 	scene.Init();
 
-	
-	if (!ResourceManager::Instance().GetPackageManager()->Pack("Resources/niva1", "Resources")) {
-		std::cerr << "Main::Pack(): Packing package was unsuccessful" << std::endl;
-	}
-
 	while (!WindowShouldClose()) {
 		//interface.Update();
 
