@@ -4,8 +4,13 @@
 #include "raylib.h"
 #include "OBJ_Loader.h"
 
-bool MeshResource::LoadFromData(const char* data, size_t size)
+bool MeshResource::LoadFromData(const char* data, size_t size, const std::string& fileExtension)
 {
+	if (fileExtension != ".obj") {
+		std::cerr << "MeshResource::LoadFromData(): Failed to load unsupported format" << std::endl;
+		return false;
+	}
+
 	objl::Loader objLoader;
 
 	// Parse obj data

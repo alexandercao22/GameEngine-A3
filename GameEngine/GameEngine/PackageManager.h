@@ -33,14 +33,15 @@ struct TOCEntry {
 // Supports lookup by GUID and by path
 struct MountedPackage {
 	std::string path; // Path to the mounted package
-	std::unordered_map<std::string, PackageEntry> tocByPath; // Key (string): name of the file inside the package (file.extension)
-	std::unordered_map<std::string, PackageEntry> tocByGuid; // Key (string): GUID of the asset found in its .meta file (file.extension.meta)
+	std::unordered_map<std::string, TOCEntry> tocByPath; // Key (string): name of the file inside the package (file.extension)
+	std::unordered_map<std::string, TOCEntry> tocByGuid; // Key (string): GUID of the asset found in its .meta file (file.extension.meta)
 };
 
 // Used to load and store asset file data
 struct AssetData {
 	std::unique_ptr<char[]> data;
 	uint64_t size;
+	std::string fileExtension;
 };
 
 class PackageManager {
@@ -51,7 +52,7 @@ private:
 	std::shared_mutex _mountMutex; // Used to ensure that only one thread can mount and unmount at once
 
 	// Loads asset from a specified mounted package
-	bool LoadAsset(MountedPackage& mountedPackage, const PackageEntry& packageEntry, AssetData& asset);
+	bool LoadAsset(MountedPackage& mountedPackage, const TOCEntry& tocEntry, AssetData& asset);
 
 public:
 	PackageManager() = default;

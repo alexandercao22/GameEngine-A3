@@ -22,7 +22,7 @@ bool ResourceManager::LoadResource(std::string guid, Resource *&resource) {
 			return false;
 		}
 
-		if (!resource->LoadFromData(data.data.get(), data.size)) {
+		if (!resource->LoadFromData(data.data.get(), data.size, data.fileExtension)) {
 			std::cerr << "ResourceManager::LoadResource(): Could not load resource from raw data" << std::endl;
 			return false;
 		}

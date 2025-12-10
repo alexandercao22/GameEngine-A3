@@ -5,7 +5,7 @@
 
 namespace fs = std::filesystem;
 
-bool PackageManager::LoadAsset(MountedPackage& mountedPackage, const PackageEntry& packageEntry, AssetData& asset)
+bool PackageManager::LoadAsset(MountedPackage& mountedPackage, const TOCEntry& tocEntry, AssetData& asset)
 {
 	// Read compressed data into a buffer
 	std::ifstream file(mountedPackage.path, std::ios::binary);
@@ -15,17 +15,17 @@ bool PackageManager::LoadAsset(MountedPackage& mountedPackage, const PackageEntr
 	}
 
 	AssetData compressedData;
-	compressedData.size = packageEntry.sizeCompressed;
-	compressedData.data = std::make_unique<char[]>(packageEntry.sizeCompressed);
+	compressedData.size = tocEntry.packageEntry.sizeCompressed;
+	compressedData.data = std::make_unique<char[]>(tocEntry.packageEntry.sizeCompressed);
 
 	file.clear(); // Resets read if EOF has been hit
-	file.seekg(packageEntry.offset);
+	file.seekg(tocEntry.packageEntry.offset);
 	file.read(compressedData.data.get(), compressedData.size);
 
 	// Decompress data from buffer
 	AssetData uncompressedData;
-	uncompressedData.size = packageEntry.size;
-	uncompressedData.data = std::make_unique<char[]>(packageEntry.size);
+	uncompressedData.size = tocEntry.packageEntry.size;
+	uncompressedData.data = std::make_unique<char[]>(tocEntry.packageEntry.size);
 
 	int uncompressedSize = LZ4_decompress_safe(
 		compressedData.data.get(),
@@ -39,6 +39,7 @@ bool PackageManager::LoadAsset(MountedPackage& mountedPackage, const PackageEntr
 		return false;
 	}
 
+	uncompressedData.fileExtension = fs::path(tocEntry.key).extension().string();
 	asset = std::move(uncompressedData);
 
 	return true;
@@ -354,8 +355,11 @@ bool PackageManager::MountPackage(const std::string& source)
 		// The entry data (PackageEntry)
 		in.read(reinterpret_cast<char*>(&entry.packageEntry), sizeof(entry.packageEntry));
 
-		mountedPackage.tocByPath.emplace(key, entry.packageEntry);
-		mountedPackage.tocByGuid.emplace(guid, entry.packageEntry);
+		entry.guid = guid;
+		entry.key = key;
+
+		mountedPackage.tocByPath.emplace(key, entry);
+		mountedPackage.tocByGuid.emplace(guid, entry);
 	}
 
 	std::string packageKey = sourcePath.stem().generic_string();

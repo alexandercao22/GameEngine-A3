@@ -12,7 +12,7 @@ protected:
 public:
 	virtual ~Resource() = default;
 
-	virtual bool LoadFromData(const char* data, size_t size) = 0;
+	virtual bool LoadFromData(const char* data, size_t size, const std::string& fileExtension) = 0;
 	virtual uint64_t GetMemoryUsage() = 0;
 
 	virtual Resource* LoadFromDisk(std::string id) = 0;
