@@ -177,8 +177,7 @@ bool ResourceManager::LoadObject(Resource* &resource) {
 		_threadData.erase(it);
 	
 	}
-	std::string text(data.data.get(), data.size);
-	resource->LoadFromData(text.data(), text.size());
+	resource->LoadFromData(data.data.get(), data.size, data.fileExtension);
 	_cachedResources.emplace(guid, resource);
 #ifdef TEST
 	auto t1 = std::chrono::high_resolution_clock::now();
