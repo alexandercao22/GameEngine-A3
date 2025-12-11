@@ -115,7 +115,8 @@ void Scene::Testing()
 				Transform *t = ent->GetTransform();
 				t->translation.x = (int)(i / numRow) * -5;
 				t->translation.z = (i % numRow) * -5;
-				_entities.push_back(ent);
+				_parts[0]->AddEntity(ent);
+				//_entities.push_back(ent);
 			}
 			auto t1 = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double> duration = t1 - t0;
@@ -126,12 +127,7 @@ void Scene::Testing()
 #endif
 		}
 		else if (!_parts[0]->CheckDistance(_camera.position) && _parts[0]->IsLoaded()) {
-			// Destroy entities
-			int total = _entities.size();
-			for (int j = 1; j < total; j++) {
-				delete (EntityEnemy *)_entities[j];
-			}
-			_entities.erase(firstTestEnt + 1, _entities.end());
+			_parts[0]->DestroyEntities();
 			_parts[0]->SetLoaded(false);
 		}
 	}
@@ -295,8 +291,12 @@ bool Scene::Update()
 			Transform *t = ent->GetTransform();
 			t->translation.x = (int)(i / numRow) * -5;
 			t->translation.z = (i % numRow) * -5;
-			_entities.push_back(ent);
+			_parts[0]->AddEntity(ent);
 		}
+	}
+	else if (!_parts[0]->CheckDistance(_camera.position) && _parts[0]->IsLoaded()) {
+		_parts[0]->DestroyEntities();
+		_parts[0]->SetLoaded(false);
 	}
 
 	// GREEN part
@@ -314,14 +314,18 @@ bool Scene::Update()
 			t->translation.y = 10.0f;
 			t->translation.z = (i % numRow) * -10;
 			t->scale = { 10.0f, 10.0f, 10.0f };
-			_entities.push_back(ent);
+			_parts[1]->AddEntity(ent);
 		}
+	}
+	else if (!_parts[1]->CheckDistance(_camera.position) && _parts[1]->IsLoaded()) {
+		_parts[1]->DestroyEntities();
+		_parts[1]->SetLoaded(false);
 	}
 
 	// RED part
 	if (_parts.size() > 2 &&
 		_parts[2]->CheckDistance(_camera.position) && !_parts[2]->IsLoaded()) {
-		ResourceManager::Instance().AddPackage(_parts[0]->GetPath());
+		ResourceManager::Instance().AddPackage(_parts[2]->GetPath());
 		int numEnemies = 100;
 		const int numRow = 10;
 
@@ -331,8 +335,12 @@ bool Scene::Update()
 			Transform *t = ent->GetTransform();
 			t->translation.x = (int)(i / numRow) * -2;
 			t->translation.z = (i % numRow) * -2;
-			_entities.push_back(ent);
+			_parts[2]->AddEntity(ent);
 		}
+	}
+	else if (!_parts[2]->CheckDistance(_camera.position) && _parts[2]->IsLoaded()) {
+		_parts[2]->DestroyEntities();
+		_parts[2]->SetLoaded(false);
 	}
 #endif
 
@@ -367,16 +375,12 @@ bool Scene::RenderUpdate()
 		}
 	}
 
-	for (Entity *ent : _entities) {
-		Transform *transform = ent->GetTransform();
-
-		// Frustum culling (kind of)
-		Vector3 camToEnt = Vector3Normalize(transform->translation - _camera.position);
-		Vector3 camForward = Vector3Normalize(_camera.target - _camera.position);
-		float dot = Vector3DotProduct(camToEnt, camForward);
-		if (dot < cos((_camera.fovy / 2))) {
-			continue;
+	for (ScenePart *part : _parts) {
+		std::vector<Entity *> entities = part->GetEntities();
+		for (Entity *ent : entities) {
+			RenderResources(ent);
 		}
+	}
 
 	for (Entity *ent : _entities) {
 		RenderResources(ent);
