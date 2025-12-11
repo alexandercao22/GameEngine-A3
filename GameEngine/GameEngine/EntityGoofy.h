@@ -8,7 +8,7 @@ private:
 
 public:
 	EntityGoofy() = default;
-	~EntityGoofy();
+	~EntityGoofy() override;
 
 	bool Init() override;
 

@@ -23,7 +23,7 @@ protected:
 
 public:
 	Entity() = default;
-	~Entity() = default;
+	virtual ~Entity() = default;
 
 	virtual bool Init();
 	virtual bool Update();

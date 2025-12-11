@@ -8,7 +8,7 @@ private:
 
 public:
 	EntityEnemy() = default;
-	~EntityEnemy();
+	~EntityEnemy() override;
 
 	bool Init() override;
 

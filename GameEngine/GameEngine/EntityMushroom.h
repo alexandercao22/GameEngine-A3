@@ -8,7 +8,7 @@ private:
 
 public:
 	EntityMushroom() = default;
-	~EntityMushroom();
+	~EntityMushroom() override;
 
 	bool Init() override;
 
