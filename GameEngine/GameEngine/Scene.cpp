@@ -210,13 +210,6 @@ bool Scene::Init(unsigned int width, unsigned int height)
 	level3->Init({ -40, 0, -40 }, "Resources/Level3.gepak");
 	_parts.push_back(level3);
 
-	//std::string texturesPkg = "Resources/Textures.gepak";
-	//ResourceManager::Instance().GetPackageManager()->Pack("Resources/Textures", "Resources");
-	//if (!ResourceManager::Instance().GetPackageManager()->MountPackage(texturesPkg)) {
-	//	std::cerr << "Scene::Init(): Could not load package: " << texturesPkg << std::endl;
-	//	return false;
-	//}
-
 	// Initialize camera
 	_camera.position = { 0.0f, 2.0f, 10.0f };
 	_camera.target = { 0.0f, 0.0f, 0.0f };
