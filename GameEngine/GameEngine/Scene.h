@@ -24,6 +24,7 @@ private:
 	unsigned int _height = 720;
 
 	bool RenderInterface();
+	void RenderResources(Entity *ent);
 
 	void Testing();
 

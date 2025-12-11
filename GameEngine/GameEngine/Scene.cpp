@@ -59,6 +59,33 @@ bool Scene::RenderInterface()
 	return true;
 }
 
+void Scene::RenderResources(Entity *ent)
+{
+	Transform *transform = ent->GetTransform();
+
+	// Frustum culling (kind of)
+	Vector3 camToEnt = Vector3Normalize(transform->translation - _camera.position);
+	Vector3 camForward = Vector3Normalize(_camera.target - _camera.position);
+	float dot = Vector3DotProduct(camToEnt, camForward);
+	if (dot < cos((_camera.fovy / 2))) {
+		return;
+	}
+
+	MeshResource *mesh = ent->GetMesh();
+	TextureResource *texture = ent->GetTexture();
+	if (mesh != nullptr) {
+		if (texture != nullptr) {
+			SetMaterialTexture(&mesh->GetModel().materials[0], MATERIAL_MAP_DIFFUSE, texture->GetTexture());
+			Vector3 rotation = { transform->rotation.x, transform->rotation.y, transform->rotation.z };
+			DrawModelEx(mesh->GetModel(), transform->translation, rotation, transform->rotation.w, transform->scale, WHITE);
+		}
+		else {
+			Vector3 rotation = { transform->rotation.x, transform->rotation.y, transform->rotation.z };
+			DrawModelEx(mesh->GetModel(), transform->translation, rotation, transform->rotation.w, transform->scale, RED);
+		}
+	}
+}
+
 void Scene::Testing()
 {
 	static bool doneTesting = false;
@@ -351,19 +378,8 @@ bool Scene::RenderUpdate()
 			continue;
 		}
 
-		MeshResource *mesh = ent->GetMesh();
-		TextureResource *texture = ent->GetTexture();
-		if (mesh != nullptr) {
-			if (texture != nullptr) {
-				SetMaterialTexture(&mesh->GetModel().materials[0], MATERIAL_MAP_DIFFUSE, texture->GetTexture());
-				Vector3 rotation = { transform->rotation.x, transform->rotation.y, transform->rotation.z };
-				DrawModelEx(mesh->GetModel(), transform->translation, rotation, transform->rotation.w, transform->scale, WHITE);
-			}
-			else {
-				Vector3 rotation = { transform->rotation.x, transform->rotation.y, transform->rotation.z };
-				DrawModelEx(mesh->GetModel(), transform->translation, rotation, transform->rotation.w, transform->scale, RED);
-			}
-		}
+	for (Entity *ent : _entities) {
+		RenderResources(ent);
 	}
 
 	DrawGrid(40, 1.0f);
