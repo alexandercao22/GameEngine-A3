@@ -8,8 +8,6 @@ EntityGoofy::~EntityGoofy()
 {
     ResourceManager::Instance().UnloadResource("2ed278c8-3fd8-48fc-9ed9-72258ce32ddc");
     ResourceManager::Instance().UnloadResource("0c90b967-b4af-40fe-a0ab-719e95ffd424");
-    delete _mesh;
-    delete _texture;
 }
 
 bool EntityGoofy::Init()

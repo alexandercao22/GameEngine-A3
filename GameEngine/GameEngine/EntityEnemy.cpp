@@ -9,8 +9,6 @@ EntityEnemy::~EntityEnemy()
 {
     ResourceManager::Instance().UnloadResource("5f1e388c-39c4-471d-bfa2-727ab986dd1c");
     ResourceManager::Instance().UnloadResource("4fee39f8-43fc-46ba-9263-2081981e4637");
-    delete _mesh;
-    delete _texture;
 }
 
 bool EntityEnemy::Init()
