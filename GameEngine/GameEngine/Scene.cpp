@@ -59,8 +59,18 @@ bool Scene::RenderInterface()
 	return true;
 }
 
-double Scene::Testing()
+void Scene::Testing()
 {
+	static bool doneTesting = false;
+	if (doneTesting) {
+		return;
+	}
+
+	static int nRuns = 0;
+	const int nIterations = 10;
+	static float t = 0.0f;
+	static double avg = 0.0f;
+
 	const auto firstTestEnt = _entities.begin();
 	if (_parts.size() > 0) {
 		if (_parts[0]->CheckDistance(_camera.position) && !_parts[0]->IsLoaded()) {
@@ -82,11 +92,11 @@ double Scene::Testing()
 			}
 			auto t1 = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double> duration = t1 - t0;
+			avg += duration.count();
 
 #ifdef DEBUG
 			std::cout << "Time to load " << numEnemies << " EntityEnemy (BLUE): " << duration.count() << "s" << std::endl;
 #endif
-			return duration.count();
 		}
 		else if (!_parts[0]->CheckDistance(_camera.position) && _parts[0]->IsLoaded()) {
 			// Destroy entities
@@ -99,7 +109,31 @@ double Scene::Testing()
 		}
 	}
 
-	return 0.0;
+	if (nRuns > nIterations) {
+		doneTesting = true;
+
+#ifdef DEBUG
+		avg /= nIterations;
+		std::cout << "Average loading time (BLUE) of " << nIterations << " iterations: " << avg << "s" << std::endl;
+#endif
+	}
+
+	t += GetFrameTime();
+	if (_parts[0]->CheckDistance(_camera.position)) {
+		if (t > 5.0f) {
+			t = 0.0f;
+			_camera.position = { 0.0f, 10.0f, 0.0f };
+			_camera.target = { 0.0f, 10.0f, -1.0f };
+		}
+	}
+	else {
+		if (t > 1.0f) {
+			t = 0.0f;
+			_camera.position = { -40.0f, 10.0f, 0.0f };
+			_camera.target = { -40.0f, 10.0f, -1.0f };
+			nRuns++;
+		}
+	}
 }
 
 Scene::~Scene()
@@ -276,40 +310,7 @@ bool Scene::Update()
 #endif
 
 #ifdef TEST
-	static bool doneTesting = false;
-	if (!doneTesting) {
-		static int nRuns = 0;
-		const int nIterations = 10;
-		static float t = 0.0f;
-		static double avg = 0.0f;
-		if (nRuns <= nIterations) {
-			avg += Testing();;
-		}
-		else {
-#ifdef DEBUG
-			avg /= nIterations;
-			std::cout << "Average loading time (BLUE) of " << nIterations << " iterations: " << avg << "s" << std::endl;
-#endif
-			doneTesting = true;
-		}
-
-		t += GetFrameTime();
-		if (_parts[0]->CheckDistance(_camera.position)) {
-			if (t > 5.0f) {
-				t = 0.0f;
-				_camera.position = { 0.0f, 10.0f, 0.0f };
-				_camera.target = { 0.0f, 10.0f, -1.0f };
-			}
-		}
-		else {
-			if (t > 1.0f) {
-				t = 0.0f;
-				_camera.position = { -40.0f, 10.0f, 0.0f };
-				_camera.target = { -40.0f, 10.0f, -1.0f };
-				nRuns++;
-			}
-		}
-	}
+	Testing();
 #endif
 
 	if (!_showCursor) {

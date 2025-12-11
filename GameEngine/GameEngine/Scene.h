@@ -25,7 +25,7 @@ private:
 
 	bool RenderInterface();
 
-	double Testing();
+	void Testing();
 
 public:
 	Scene() = default;
