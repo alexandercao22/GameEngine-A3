@@ -25,6 +25,8 @@ private:
 
 	bool RenderInterface();
 
+	double Testing();
+
 public:
 	Scene() = default;
 	~Scene();
